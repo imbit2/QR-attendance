@@ -8,9 +8,10 @@ async function loadStudents() {
 
     querySnapshot.forEach((doc) => {
         let li = document.createElement("li");
-        li.textContent = doc.data().studentId;
+        li.textContent = doc.data().id;
         studentList.appendChild(li);
     });
 }
 
 loadStudents();
+

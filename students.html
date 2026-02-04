@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <title>Student List</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <script type="module" src="script.js"></script>
   <link rel="stylesheet" href="style.css">
-  <script src="script.js"></script>
-  <script defer src="student_list.js"></script>
 </head>
 
 <body>
@@ -29,8 +27,8 @@
       autocomplete="off"
     />
 
-    <button class="icon-btn" onclick="searchStudent()">🔍</button>
-    <button class="icon-btn" onclick="clearSearch()">❌</button>
+    <button class="icon-btn" id="searchBtn">🔍</button>
+    <button class="icon-btn" id="clearBtn">❌</button>
   </div>
 
   <!-- Student Table -->
@@ -44,14 +42,16 @@
         </tr>
       </thead>
       <tbody id="studentTableBody">
-        <!-- Populated by student_list.js -->
+        <!-- Filled by students.js -->
       </tbody>
     </table>
   </div>
+
+</div>
+
+<!-- LOAD FIREBASE + STUDENT LOGIC -->
 <script type="module" src="firebase-config.js"></script>
 <script type="module" src="students.js"></script>
-</div>
+
 </body>
 </html>
-
-

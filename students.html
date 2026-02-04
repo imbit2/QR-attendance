@@ -1,18 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Student List</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Student List</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js"></script>
+  <script defer src="student_list.js"></script>
 </head>
+
 <body>
-<div class="container">
-<h2>Student's List</h2>
 
-<ul id="studentList"></ul>
+<div class="page-container">
 
+  <h2 class="page-title">Student List</h2>
+
+  <button onclick="location.href='generate.html'" class="primary-btn">
+    ➕ Generate Bulk QR
+  </button>
+
+  <!-- SEARCH BAR -->
+  <div class="search-row">
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Search by Student ID or Name"
+      autocomplete="off"
+    />
+
+    <button class="icon-btn" onclick="searchStudent()">🔍</button>
+    <button class="icon-btn" onclick="clearSearch()">❌</button>
+  </div>
+
+  <!-- Student Table -->
+  <div>
+    <table id="summaryTable">
+      <thead>
+        <tr>
+          <th style="width:120px;">ID</th>
+          <th>Name</th>
+          <th style="width:80px;">Action</th>
+        </tr>
+      </thead>
+      <tbody id="studentTableBody">
+        <!-- Populated by student_list.js -->
+      </tbody>
+    </table>
+  </div>
 <script type="module" src="firebase-config.js"></script>
 <script type="module" src="students.js"></script>
 </div>
 </body>
 </html>
+

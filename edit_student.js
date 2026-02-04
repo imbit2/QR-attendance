@@ -33,7 +33,6 @@ async function loadStudent() {
 
     const student = snap.data();
 
-    // Fill form
     document.getElementById("studentId").value = studentId;
     document.getElementById("studentName").value = student.name || "";
     document.getElementById("studentGuardian").value = student.guardian || "";
@@ -73,4 +72,5 @@ async function updateStudent() {
   }
 }
 
-
+/* Make updateStudent available to HTML */
+window.updateStudent = updateStudent;

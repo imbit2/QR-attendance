@@ -2,13 +2,8 @@ import { db } from "./firebase-config.js";
 import {
   doc,
   getDoc,
-  updateDoc,
-  collection,
-  getDocs
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
 
 /* ==========================================================
       GET STUDENT ID FROM URL
@@ -18,24 +13,25 @@ const studentId = params.get("id");
 
 if (!studentId) {
   alert("Invalid student ID");
-  location.href = "student_list.html";
+  location.href = "student.html";
 }
+
+let studentDocRef = doc(db, "students", studentId);
 
 /* ==========================================================
       LOAD STUDENT DATA FROM FIRESTORE
 ========================================================== */
-let student = null;
-
 async function loadStudent() {
   try {
-    const doc = await db.collection("students").doc(studentId).get();
-    if (!doc.exists) {
-      alert("Student not found in database");
-      location.href = "student_list.html";
+    const snap = await getDoc(studentDocRef);
+
+    if (!snap.exists()) {
+      alert("Student not found in database.");
+      location.href = "student.html";
       return;
     }
 
-    student = doc.data();
+    const student = snap.data();
 
     // Fill form
     document.getElementById("studentId").value = studentId;
@@ -48,7 +44,7 @@ async function loadStudent() {
 
   } catch (err) {
     console.error(err);
-    alert("Failed to load student");
+    alert("Failed to load student from database.");
   }
 }
 
@@ -58,8 +54,6 @@ loadStudent();
       UPDATE STUDENT (FIRESTORE)
 ========================================================== */
 async function updateStudent() {
-  adminOnly(); // if you are using this security function
-
   const updated = {
     name: document.getElementById("studentName").value.trim(),
     guardian: document.getElementById("studentGuardian").value.trim(),
@@ -71,17 +65,11 @@ async function updateStudent() {
   };
 
   try {
-    await db.collection("students").doc(studentId).update(updated);
+    await updateDoc(studentDocRef, updated);
     alert("Student updated successfully ✅");
   } catch (err) {
     console.error(err);
-    alert("Error updating student");
+    alert("Error updating student.");
   }
 }
 
-/* ==========================================================
-      REPRINT CARD
-========================================================== */
-function reprintCard() {
-  location.href = "generate_student_qr.html?id=" + studentId;
-}

@@ -73,3 +73,34 @@ textarea:focus {
   justify-items: center;
   margin-top: 20px;
 }
+/* ===== Search Row ===== */
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  width: 100%;
+}
+
+/* Search input */
+.search-row input {
+  flex: 1;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 14px;
+  border: 1px solid #ddd;
+  min-width: 0; /* VERY IMPORTANT for mobile */
+}
+
+/* Icon buttons */
+.icon-btn {
+  max-width: 50px;
+  height: 50px;
+  background: #3498db;
+  color: #fff;
+  border-radius: 14px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

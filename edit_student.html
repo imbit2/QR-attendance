@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Student</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="script.js"></script>
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2 class="page-title">Edit Student</h2>
+
+  <!-- STUDENT ID (READ ONLY) -->
+  <label class="input-label">Student ID</label>
+  <input class="input-field" id="studentId" readonly>
+
+  <!-- NAME -->
+  <label class="input-label">Student Name</label>
+  <input class="input-field" id="studentName">
+
+  <!-- GUARDIAN -->
+  <label class="input-label">Guardian Name</label>
+  <input class="input-field" id="studentGuardian">
+
+  <!-- DOB -->
+  <label class="input-label">Date of Birth</label>
+  <input class="input-field" type="date" id="studentDob">
+
+  <!-- BELT -->
+  <label class="input-label">Current Belt</label>
+  <input class="input-field" id="studentBelt">
+
+  <!-- ADDRESS -->
+  <label class="input-label">Address</label>
+  <textarea class="input-field" id="studentAddress" rows="2"></textarea>
+
+  <!-- PHONE -->
+  <label class="input-label">Contact Number</label>
+  <input class="input-field" id="studentPhone" inputmode="numeric">
+
+  <!-- UPDATE BUTTON -->
+  <button class="primary-btn" onclick="updateStudent()">Update Student</button>
+
+</div>
+
+<script type="module" src="edit_student.js"></script>
+<script type="module" src="students.js"></script>
+</body>
+</html>

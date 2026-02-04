@@ -1,12 +1,4 @@
-body {
-   //* background-color: #f2f5fa;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /*height: 100vh;
-    margin: 0;*/
-    
+body {  
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   background: #f2f5f9;
@@ -15,7 +7,7 @@ body {
 
 .container {
     max-width: 480px;
-  margin: 0 auto;
+  margin: auto;
   padding: 16px;
 }
 
@@ -157,5 +149,13 @@ textarea:focus {
     padding: 0;
   }
 }
-
-
+@media (max-width: 360px) {
+  .container {
+    padding: 12px;
+  }
+  .primary-btn,
+  button {
+    font-size: 16px;
+    padding: 14px;
+  }
+}

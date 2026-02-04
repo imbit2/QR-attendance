@@ -13,7 +13,7 @@ const studentId = params.get("id");
 
 if (!studentId) {
   alert("Invalid student ID");
-  location.href = "student.html";
+  location.href = "students.html";
 }
 
 let studentDocRef = doc(db, "students", studentId);
@@ -27,7 +27,7 @@ async function loadStudent() {
 
     if (!snap.exists()) {
       alert("Student not found in database.");
-      location.href = "student.html";
+      location.href = "students.html";
       return;
     }
 
@@ -72,4 +72,5 @@ async function updateStudent() {
     alert("Error updating student.");
   }
 }
+
 

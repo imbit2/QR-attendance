@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Student Profile</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="script.js"></script>
+</head>
+
+<body>
+<div class="page-container card">
+
+  <h2 style="text-align:center;">Playmate Taekwondo Club</h2>
+  <hr>
+
+  <div style="display:flex; justify-content:space-between; gap:16px; margin-top:16px;">
+
+    <div style="flex:1;">
+      <p><b>Student ID:</b> <span id="pId"></span></p>
+      <p><b>Student Name:</b> <span id="pName"></span></p>
+      <p><b>Guardian's Name:</b> <span id="pGuardian"></span></p>
+      <p><b>DOB:</b> <span id="pDob"></span></p>
+      <p><b>Belt:</b> <span id="pBelt"></span></p>
+      <p><b>Address:</b> <span id="pAddress"></span></p>
+      <p><b>Phone:</b> <span id="pPhone"></span></p>
+    </div>
+
+    <div style="width:120px; text-align:center;">
+      <div id="qrBox"></div>
+    </div>
+
+  </div>
+
+  <hr>
+
+  <h3>Attendance History</h3>
+  <div id="attendanceHistory"></div>
+
+</div>
+
+<script src="student_profile.js"></script>
+</body>
+</html>

@@ -10,7 +10,7 @@ body {
 
 .container {
     max-width: 480px;
-  margin: auto;
+  margin: 0 auto;
   padding: 16px;
 }
 
@@ -142,3 +142,4 @@ textarea:focus {
   margin-bottom: 14px;
   box-shadow: 0 6px 14px rgba(0,0,0,0.08);
 }
+

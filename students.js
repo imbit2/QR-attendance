@@ -14,17 +14,17 @@ window.studentsCache = []; // accessible from scan_qr.js
 ===================================================== */
 async function loadStudentsFromFirebase() {
   try {
-    const querySnapshot = await getDocs(collection(db, "students"));
+    const snap = await getDocs(collection(db, "students"));
 
-    students = [];
-    querySnapshot.forEach(doc => {
-      students.push(doc.data());
-    });
+    students = snap.docs.map(doc => ({
+      id: doc.id,        // IMPORTANT FIX
+      ...doc.data()
+    }));
 
-    // Keep for QR scanner
-    window.studentsCache = students;
+    window.studentsCache = students; // keep sync for QR scanner
 
     renderStudentList(students);
+
   } catch (error) {
     console.error("Error loading students:", error);
     alert("Failed to load students from database.");
@@ -37,7 +37,6 @@ async function loadStudentsFromFirebase() {
 document.addEventListener("DOMContentLoaded", async () => {
   await loadStudentsFromFirebase();
 
-  // Search listener
   const searchBox = document.getElementById("searchInput");
   if (searchBox) {
     searchBox.addEventListener("input", searchStudent);
@@ -51,7 +50,7 @@ function renderStudentList(list) {
   const tbody = document.getElementById("studentTableBody");
   tbody.innerHTML = "";
 
-  if (!list || list.length === 0) {
+  if (!Array.isArray(list) || list.length === 0) {
     tbody.innerHTML = `<tr><td colspan="3">No students found</td></tr>`;
     return;
   }

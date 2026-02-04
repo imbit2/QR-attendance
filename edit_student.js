@@ -60,7 +60,7 @@ async function updateStudent() {
     belt: document.getElementById("studentBelt").value.trim(),
     address: document.getElementById("studentAddress").value.trim(),
     phone: document.getElementById("studentPhone").value.trim(),
-    updatedAt: new Date().toISOString(),
+    updatedAt: new Date().toLocaleString(),
   };
 
   try {
@@ -74,3 +74,4 @@ async function updateStudent() {
 
 /* Make updateStudent available to HTML */
 window.updateStudent = updateStudent;
+

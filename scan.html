@@ -13,7 +13,7 @@
 
 <body onload="startScan()">
 
-<div class="page-container">
+<div class="container">
   <h2 class="page-title">QR Attendance Scanner</h2>
 
   <div id="qr-reader" style="width:100%;"></div>
@@ -24,8 +24,18 @@
 </div>
 
 <script src="scan.js"></script>
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    if (typeof startScan === "function") {
+      startScan();
+    } else {
+      console.error("startScan() missing from scan.js");
+    }
+  });
+</script>
 </body>
 </html>
+
 
 
 

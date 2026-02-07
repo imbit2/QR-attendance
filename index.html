@@ -9,11 +9,14 @@
 
 <div class="container">
 <h1>Main Manu</h1>
-
+<input type="file" id="excelFile" accept=".xlsx, .xls" />
+<button onclick="importStudents()">Import Students</button>
 <button onclick="location.href='generate.html'">Generate Bulk QR</button>
 <button onclick="location.href='students.html'">Student List</button>
 <button onclick="location.href='scan.html'">Scan QR</button>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script type="module" src="import-students.js"></script>
 
 </body>
 </html>

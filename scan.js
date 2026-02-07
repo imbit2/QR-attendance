@@ -74,18 +74,28 @@ function startScan() {
 
   Html5Qrcode.getCameras()
     .then(devices => {
+
       if (!devices || devices.length === 0) {
         alert("No camera found");
         scanStarted = false;
         return;
       }
 
+      let backCam = devices.find(cam =>
+        cam.label.toLowerCase().includes("back")
+      );
+
+      if (!backCam) backCam = devices[devices.length - 1];
+
       return html5QrCode.start(
-        { deviceId: { exact: devices[0].id } },
+        { deviceId: { exact: backCam.id } },
         {
           fps: 25,
           qrbox: 300,
-          disableFlip: true
+          disableFlip: true,
+          videoConstraints: {
+            facingMode: { exact: "environment" }
+          }
         },
         onScanSuccess,
         () => {}
@@ -209,3 +219,4 @@ function speak(text) {
 
 /* Expose startScan globally for button */
 window.startScan = startScan;
+

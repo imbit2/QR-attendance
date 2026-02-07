@@ -53,7 +53,7 @@ textarea {
   font-size: 16px;
   border-radius: 12px;
   border: 1px solid #dcdfe6;
-  margin-bottom: 14px;
+  margin-bottom: 8px;
   background: #fff;
 }
 
@@ -159,3 +159,4 @@ textarea:focus {
     padding: 14px;
   }
 }
+

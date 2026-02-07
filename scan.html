@@ -1,21 +1,32 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Scan QR</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="style.css">
+  <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self';">
+  <title>Scan QR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- html5-qrcode -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
-<body>
-<div class="container">
-<h2>Scan QR Code</h2>
 
-<div id="reader" style="width:300px;"></div>
-<p id="result"></p>
+<body onload="startScan()">
 
-<script src="https://unpkg.com/html5-qrcode"></script>
+<div class="page-container">
+  <h2 class="page-title">QR Attendance Scanner</h2>
 
-<script type="module" src="firebase-config.js"></script>
-<script type="module" src="scan.js"></script>
+  <div id="qr-reader" style="width:100%;"></div>
+
+  <button class="primary-btn danger-btn" onclick="stopScan()">
+    End Scan
+  </button>
 </div>
+
+<script src="scan.js"></script>
 </body>
 </html>
+
+
+
+

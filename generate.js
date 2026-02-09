@@ -53,6 +53,7 @@ async function saveGeneratedIdsToStudents(ids) {
         address: "",
         belt: "",
         phone: "",
+        gender: "",
       });
     }
   }
@@ -200,3 +201,4 @@ async function exportPDF() {
 window.generateBulk = generateBulk;
 window.exportPNG = exportPNG;
 window.exportPDF = exportPDF;
+

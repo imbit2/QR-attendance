@@ -41,6 +41,13 @@ async function loadStudent() {
     document.getElementById("studentAddress").value = student.address || "";
     document.getElementById("studentPhone").value = student.phone || "";
 
+    /* ---- LOAD GENDER ---- */
+    if (student.gender === "Male") {
+      document.getElementById("genderMale").checked = true;
+    } else if (student.gender === "Female") {
+      document.getElementById("genderFemale").checked = true;
+    }
+
   } catch (err) {
     console.error(err);
     alert("Failed to load student from database.");
@@ -53,6 +60,9 @@ loadStudent();
       UPDATE STUDENT (FIRESTORE)
 ========================================================== */
 async function updateStudent() {
+  const genderSelected =
+    document.querySelector('input[name="studentGender"]:checked')?.value || "";
+
   const updated = {
     name: document.getElementById("studentName").value.trim(),
     guardian: document.getElementById("studentGuardian").value.trim(),
@@ -60,7 +70,8 @@ async function updateStudent() {
     belt: document.getElementById("studentBelt").value.trim(),
     address: document.getElementById("studentAddress").value.trim(),
     phone: document.getElementById("studentPhone").value.trim(),
-    updatedAt: new Date().toLocaleString(),
+    gender: genderSelected,
+    updatedAt: new Date().toLocaleString("en-IN")
   };
 
   try {
@@ -74,4 +85,3 @@ async function updateStudent() {
 
 /* Make updateStudent available to HTML */
 window.updateStudent = updateStudent;
-

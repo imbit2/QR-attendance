@@ -110,18 +110,16 @@ window.logout = function () {
 export function today() {
   return new Date().toLocaleDateString("en-CA");
 }
-
-/* =========================================================
-   SAFARI BACK-CACHE FIX
-========================================================= */
-window.addEventListener("pageshow", event => {
-  if (event.persisted) window.location.reload();
-});
 window.loadHeader = function () {
   fetch("header.html")
     .then(res => res.text())
     .then(html => {
       document.getElementById("header").innerHTML = html;
     });
-};
-
+}
+/* =========================================================
+   SAFARI BACK-CACHE FIX
+========================================================= */
+window.addEventListener("pageshow", event => {
+  if (event.persisted) window.location.reload();
+});

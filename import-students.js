@@ -65,6 +65,7 @@ window.importStudents = async function () {
                 belt: row.belt || "",
                 phone: row.phone || "",
                 address: row.address || "",
+                gender: row.gender || "",
                 updatedAt: new Date().toLocaleString("en-IN")
             };
 
@@ -84,3 +85,4 @@ window.importStudents = async function () {
         reader.readAsBinaryString(file);  // Excel needs binary
     }
 };
+

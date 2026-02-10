@@ -94,12 +94,15 @@ export function adminOnly() {
 }
 
 /* =========================================================
-   LOGOUT
+   LOGOUT FUNCTION
 ========================================================= */
-export function logout() {
+window.logout = function () {
   localStorage.removeItem("logged_role");
+  localStorage.removeItem("loginTime");
+
+  alert("You have been logged out.");
   window.location.href = "login.html";
-}
+};
 
 /* =========================================================
    HELPER: TODAY DATE (used in attendance pages)
@@ -114,3 +117,11 @@ export function today() {
 window.addEventListener("pageshow", event => {
   if (event.persisted) window.location.reload();
 });
+window.loadHeader = function () {
+  fetch("header.html")
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("header").innerHTML = html;
+    });
+};
+

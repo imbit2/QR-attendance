@@ -40,6 +40,7 @@ async function loadStudent() {
     document.getElementById("pBelt").innerText = student.belt || "-";
     document.getElementById("pPhone").innerText = student.phone || "-";
     document.getElementById("pAddress").innerText = student.address || "-";
+    document.getElementById("pGender").innerText = student.gender || "-";
 
     /* Generate QR Code */
     new QRCode(document.getElementById("qrBox"), {
@@ -121,3 +122,4 @@ async function loadAttendanceHistory() {
 }
 
 loadAttendanceHistory();
+

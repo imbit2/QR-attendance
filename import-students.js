@@ -5,30 +5,59 @@ window.importStudents = async function () {
 
     const fileInput = document.getElementById("excelFile");
     if (!fileInput.files.length) {
-        alert("Please select an Excel file first.");
+        alert("Please select an Excel or CSV file.");
         return;
     }
 
     const file = fileInput.files[0];
+    const fileName = file.name.toLowerCase();
 
-    // Read file
     const reader = new FileReader();
+
     reader.onload = async (event) => {
-        const data = event.target.result;
-        const workbook = XLSX.read(data, { type: "binary" });
+        let rows = [];
 
-        // First sheet
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
+        /* -------------------------------
+           1️⃣ EXCEL FILE (xlsx / xls)
+        ------------------------------- */
+        if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
+            const data = event.target.result;
+            const workbook = XLSX.read(data, { type: "binary" });
 
-        // Convert to JSON
-        const rows = XLSX.utils.sheet_to_json(sheet);
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
 
+            rows = XLSX.utils.sheet_to_json(sheet);
+        }
+
+        /* -------------------------------
+           2️⃣ CSV FILE
+        ------------------------------- */
+        else if (fileName.endsWith(".csv")) {
+            const text = event.target.result;
+
+            // Convert CSV → JSON using SheetJS
+            const workbook = XLSX.read(text, { type: "string" });
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+
+            rows = XLSX.utils.sheet_to_json(sheet);
+        }
+
+        else {
+            alert("Unsupported file format. Upload .xlsx, .xls, or .csv");
+            return;
+        }
+
+        /* -------------------------------
+           PROCESS STUDENT DATA
+        ------------------------------- */
         let imported = 0;
 
         for (let row of rows) {
+            const id = row.id?.toString().trim();
+            if (!id) continue;
 
-            // Clean student object (IGNORE attendance fields)
             const studentData = {
                 name: row.name || "",
                 guardian: row.guardian || "",
@@ -36,22 +65,22 @@ window.importStudents = async function () {
                 belt: row.belt || "",
                 phone: row.phone || "",
                 address: row.address || "",
-                updatedAt: new Date().toLocaleString("en-IN") // local time
+                updatedAt: new Date().toLocaleString("en-IN")
             };
 
-            const id = row.id?.toString();
-
-            if (!id) continue;
-
-            // Save to /students/<id>
             await setDoc(doc(db, "students", id), studentData, { merge: true });
-
             imported++;
         }
 
         alert(`Successfully imported ${imported} students.`);
-
     };
 
-    reader.readAsBinaryString(file);
+    /* -------------------------------
+       FileReader Mode
+    ------------------------------- */
+    if (fileName.endsWith(".csv")) {
+        reader.readAsText(file);          // CSV needs readAsText
+    } else {
+        reader.readAsBinaryString(file);  // Excel needs binary
+    }
 };

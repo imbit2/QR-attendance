@@ -48,7 +48,6 @@ label {
 input,
 select,
 textarea {
-  width: 100%;
   padding: 14px;
   font-size: 16px;
   border-radius: 12px;
@@ -172,5 +171,6 @@ textarea:focus {
   gap: 5px;
   font-size: 16px;
 }
+
 
 

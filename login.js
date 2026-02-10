@@ -36,6 +36,33 @@ window.login = async function () {
   // Store role locally (admin/coach)
   localStorage.setItem("logged_role", data.role);
 
+  // Store login timestamp for auto logout
+  localStorage.setItem("loginTime", Date.now().toString());
+
   // Redirect to dashboard
   window.location.href = "index.html";
 };
+
+/* =========================================================
+   AUTO LOGOUT after 8 hours
+========================================================= */
+function checkAutoLogout() {
+  const loginTime = localStorage.getItem("loginTime");
+  if (!loginTime) return;
+
+  const now = Date.now();
+  const eightHours = 8 * 60 * 60 * 1000;
+
+  if (now - Number(loginTime) >= eightHours) {
+    alert("Session expired. Please log in again.");
+    localStorage.removeItem("loginTime");
+    localStorage.removeItem("logged_role");
+    window.location.href = "login.html";
+  }
+}
+
+// Run check every minute
+setInterval(checkAutoLogout, 60000);
+
+// Check on page load
+checkAutoLogout();

@@ -48,13 +48,15 @@ label {
 input,
 select,
 textarea {
+  width: 100%;
   padding: 14px;
   font-size: 16px;
   border-radius: 12px;
   border: 1px solid #dcdfe6;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   background: #fff;
-  display: flex;
+  box-sizing: border-box;
+  display: block;
 }
 
 input:focus,
@@ -172,6 +174,7 @@ textarea:focus {
   gap: 5px;
   font-size: 16px;
 }
+
 
 
 

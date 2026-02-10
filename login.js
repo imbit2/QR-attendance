@@ -60,9 +60,21 @@ function checkAutoLogout() {
     window.location.href = "login.html";
   }
 }
+/* =========================================================
+   LOGOUT FUNCTION
+========================================================= */
+window.logout = function () {
+  localStorage.removeItem("logged_role");
+  localStorage.removeItem("loginTime");
+
+  alert("You have been logged out.");
+  window.location.href = "login.html";
+};
+
 
 // Run check every minute
 setInterval(checkAutoLogout, 60000);
 
 // Check on page load
 checkAutoLogout();
+

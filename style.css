@@ -54,6 +54,7 @@ textarea {
   border: 1px solid #dcdfe6;
   margin-bottom: 8px;
   background: #fff;
+  display: flex;
 }
 
 input:focus,
@@ -171,6 +172,7 @@ textarea:focus {
   gap: 5px;
   font-size: 16px;
 }
+
 
 
 

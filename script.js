@@ -48,7 +48,7 @@ export async function autoDeleteAttendanceToday() {
   const today = getLocalDateISO();
 
   const systemRef = doc(db, "system", "cleanup");
-  const sysSnap = await getDoc(systemRef);
+  const sysSnap = await getDocs(systemRef);
 
   let lastCleanup = sysSnap.exists() ? sysSnap.data().lastCleanupDate : null;
 
@@ -168,5 +168,6 @@ export function today() {
 window.addEventListener("pageshow", event => {
   if (event.persisted) window.location.reload();
 });
+
 
 

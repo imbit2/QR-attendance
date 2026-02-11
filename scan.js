@@ -16,10 +16,15 @@ import {
 ========================================================= */
 let html5QrCode;
 let scanStarted = false;
-
 const today = new Date().toLocaleDateString("en-CA");
-
 let studentsCache = [];
+
+/* =========================================================
+   HELPER: Valid student (skip empty name)
+========================================================= */
+function isValidStudent(s) {
+  return s.name && s.name.trim() !== "";
+}
 
 /* =========================================================
    ON PAGE LOAD
@@ -30,27 +35,28 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 /* =========================================================
-   LOAD STUDENTS FROM FIRESTORE
+   LOAD STUDENTS
 ========================================================= */
 async function loadStudents() {
   const snap = await getDocs(collection(db, "students"));
-  studentsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  studentsCache = snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(isValidStudent); // ⬅ Skip empty-name students
 }
 
 /* =========================================================
-   RESET TODAY’S ATTENDANCE IN FIRESTORE
+   RESET TODAY’S ATTENDANCE
 ========================================================= */
 async function resetAttendanceToday() {
   const ref = doc(db, "attendance_today", today);
   const snap = await getDoc(ref);
 
-  if (snap.exists()) return; // Already initialized
+  if (snap.exists()) return;
 
-  // Create EMPTY structure for today
   let data = {};
 
   studentsCache.forEach(s => {
-    if (!s.name || s.name.trim() === "") return;
+    if (!isValidStudent(s)) return; // ⬅ Skip empty name
 
     data[s.id] = {
       scans: [],
@@ -74,7 +80,6 @@ function startScan() {
 
   Html5Qrcode.getCameras()
     .then(devices => {
-
       if (!devices || devices.length === 0) {
         alert("No camera found");
         scanStarted = false;
@@ -93,9 +98,7 @@ function startScan() {
           fps: 25,
           qrbox: 300,
           disableFlip: true,
-          videoConstraints: {
-            facingMode: { exact: "environment" }
-          }
+          videoConstraints: { facingMode: { exact: "environment" } }
         },
         onScanSuccess,
         () => {}
@@ -117,17 +120,16 @@ function onScanSuccess(id) {
 
   handleAttendance(id);
 
-  setTimeout(() => scanLocked = false, 3000);
+  setTimeout(() => (scanLocked = false), 3000);
 }
 
 /* =========================================================
-   MAIN ATTENDANCE LOGIC (FIRESTORE VERSION)
+   MAIN ATTENDANCE LOGIC
 ========================================================= */
 async function handleAttendance(studentId) {
-
   const student = studentsCache.find(s => s.id === studentId);
 
-  if (!student) {
+  if (!student || !isValidStudent(student)) {
     speak("Invalid ID");
     return;
   }
@@ -137,7 +139,6 @@ async function handleAttendance(studentId) {
 
   let todayData = todaySnap.exists() ? todaySnap.data() : {};
 
-  // Ensure student record exists
   if (!todayData[studentId]) {
     todayData[studentId] = {
       scans: [],
@@ -151,18 +152,16 @@ async function handleAttendance(studentId) {
   const now = new Date();
   const timeStr = now.toTimeString().slice(0, 5);
 
-  /* --- Already scanned twice --- */
   if (record.scans.length >= 2) {
     speak("Attendance already done");
     return;
   }
 
-  /* --- Second scan (out time) --- */
   if (record.scans.length === 1) {
     const first = record.scans[0];
     const [h, m] = first.split(":").map(Number);
 
-    const firstScan = new Date();  
+    const firstScan = new Date();
     firstScan.setHours(h, m, 0);
 
     const diffMins = (now - firstScan) / 60000;
@@ -177,12 +176,11 @@ async function handleAttendance(studentId) {
 
     await updateDoc(todayRef, { [studentId]: record });
     await saveToPermanentHistory(studentId, record);
-
     speak("Thank you");
     return;
   }
 
-  /* --- First scan (in time) --- */
+  // FIRST SCAN
   record.scans.push(timeStr);
   record.inTime = timeStr;
   record.status = "Present";
@@ -194,7 +192,7 @@ async function handleAttendance(studentId) {
 }
 
 /* =========================================================
-   SAVE TO FIRESTORE → attendance (permanent)
+   SAVE TO PERMANENT HISTORY
 ========================================================= */
 async function saveToPermanentHistory(studentId, record) {
   const historyRef = doc(db, "attendance", today);
@@ -203,6 +201,19 @@ async function saveToPermanentHistory(studentId, record) {
   let historyData = historySnap.exists() ? historySnap.data() : {};
 
   historyData[studentId] = record;
+
+  studentsCache.forEach(s => {
+    if (!isValidStudent(s)) return; // ⬅ Skip empty names
+
+    if (!historyData[s.id]) {
+      historyData[s.id] = {
+        status: "Absent",
+        inTime: "",
+        outTime: "",
+        scans: []
+      };
+    }
+  });
 
   await setDoc(historyRef, historyData, { merge: true });
 }
@@ -217,6 +228,4 @@ function speak(text) {
   speechSynthesis.speak(msg);
 }
 
-/* Expose startScan globally for button */
 window.startScan = startScan;
-

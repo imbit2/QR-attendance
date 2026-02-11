@@ -4,14 +4,17 @@
 import { db } from "./firebase-config.js";
 import {
   collection,
-  getDocs
+  getDocs,
+   doc,
+   setDoc,
+   deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 /* =========================================================
    MAIN PAGE LOADER
 ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
-
+autoDeleteAttendanceToday();
   const filename = window.location.pathname.split("/").pop();
 
   /* ---------------------------------------------
@@ -29,7 +32,47 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 });
+/* =========================================================
+   AUTO DELETE YESTERDAY'S attendance_today
+========================================================= */
+function getLocalDateISO() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
+export async function autoDeleteAttendanceToday() {
+
+  const today = getLocalDateISO();
+
+  const systemRef = doc(db, "system", "cleanup");
+  const sysSnap = await getDoc(systemRef);
+
+  let lastCleanup = sysSnap.exists() ? sysSnap.data().lastCleanupDate : null;
+
+  // First-time initialization
+  if (!lastCleanup) {
+    await setDoc(systemRef, { lastCleanupDate: today });
+    return;
+  }
+
+  // Already cleaned today → do nothing
+  if (lastCleanup === today) return;
+
+  // Cleanup yesterday’s document
+  try {
+    const oldRef = doc(db, "attendance_today", lastCleanup);
+    await deleteDoc(oldRef);
+    console.log("✔ Deleted old attendance_today:", lastCleanup);
+  } catch (e) {
+    console.error("❌ Delete failed:", e);
+  }
+
+  // Update cleanup date
+  await setDoc(systemRef, { lastCleanupDate: today });
+}
 /* =========================================================
    EXPORT STUDENTS (FIREBASE VERSION)
 ========================================================= */
@@ -125,4 +168,5 @@ export function today() {
 window.addEventListener("pageshow", event => {
   if (event.persisted) window.location.reload();
 });
+
 

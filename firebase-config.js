@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-const firebaseConfig = {
+export const firebaseConfig = {
     apiKey: "AIzaSyAOMIc-0eaRd6OB-khaSm_nE2SVOTXJHMU",
     authDomain: "attendance-11b46.firebaseapp.com",
     projectId: "attendance-11b46",
@@ -13,3 +13,4 @@ const firebaseConfig = {
 
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+

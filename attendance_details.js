@@ -95,12 +95,28 @@ function renderTable() {
 // ==========================
 function renderPagination() {
   const totalPages = Math.ceil(currentStudents.length / rowsPerPage);
-
   const container = document.getElementById("paginationContainer");
   container.innerHTML = "";
 
   if (totalPages <= 1) return;
 
+  // --- PREVIOUS BUTTON ---
+  const prevBtn = document.createElement("button");
+  prevBtn.textContent = "<";
+  prevBtn.className = "pagination-btn";
+  prevBtn.disabled = currentPage === 1;
+
+  prevBtn.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderTable();
+      renderPagination();
+    }
+  });
+
+  container.appendChild(prevBtn);
+
+  // --- PAGE NUMBER BUTTONS ---
   for (let i = 1; i <= totalPages; i++) {
     const btn = document.createElement("button");
     btn.textContent = i;
@@ -115,6 +131,22 @@ function renderPagination() {
 
     container.appendChild(btn);
   }
+
+  // --- NEXT BUTTON ---
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = ">";
+  nextBtn.className = "pagination-btn";
+  nextBtn.disabled = currentPage === totalPages;
+
+  nextBtn.addEventListener("click", () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderTable();
+      renderPagination();
+    }
+  });
+
+  container.appendChild(nextBtn);
 }
 
 // ==========================
@@ -143,3 +175,4 @@ async function exportExcel() {
 }
 
 window.exportExcel = exportExcel;
+

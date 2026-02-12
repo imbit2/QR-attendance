@@ -237,4 +237,7 @@ textarea:focus {
   background: #2e7d32; /* Green */
 }
 
-
+#paginationContainer .pagination-btn:disabled {
+  background: #9e9e9e;
+  cursor: not-allowed;
+}

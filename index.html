@@ -13,10 +13,10 @@
 
 	<div id="header"></div>
 	
-<input type="file" id="excelFile" accept=".xlsx, .xls, .csv" />
-<button onclick="importStudents()">Import Students</button>
-<button onclick="location.href='generate.html'">Generate Bulk QR</button>
-<button onclick="location.href='students.html'">Student List</button>
+<input class="admin-only" type="file" id="excelFile" accept=".xlsx, .xls, .csv" />
+<button class="admin-only" onclick="importStudents()">Import Students</button>
+<button class="admin-only" onclick="location.href='generate.html'">Generate Bulk QR</button>
+<button class="admin-only" onclick="location.href='students.html'">Student List</button>
 <button onclick="location.href='scan.html'">Scan QR</button>
 <button onclick="location.href='attendance_details.html'">Attendance Details</button>
 </div>
@@ -31,6 +31,7 @@
 	
 </body>
 </html>
+
 
 
 

@@ -6,6 +6,12 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+// Pagination Variables
+let currentPage = 1;
+let rowsPerPage = 10;
+let currentStudents = [];
+let currentDayData = {};
+
 // ==========================
 // PAGE LOAD
 // ==========================
@@ -20,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadAttendance(today);
 
   dateInput.addEventListener("change", () => {
+    currentPage = 1;
     loadAttendance(dateInput.value);
   });
 });
@@ -33,32 +40,81 @@ async function loadAttendance(date) {
 
   // Load all students
   const studentsSnap = await getDocs(collection(db, "students"));
-  const students = [];
-  studentsSnap.forEach(doc => students.push({ id: doc.id, ...doc.data() }));
+  currentStudents = [];
+  studentsSnap.forEach(doc => currentStudents.push({ id: doc.id, ...doc.data() }));
 
   // Load attendance for selected date
   const attendanceRef = doc(db, "attendance", date);
   const attendanceSnap = await getDoc(attendanceRef);
-  const dayData = attendanceSnap.exists() ? attendanceSnap.data() : {};
+  currentDayData = attendanceSnap.exists() ? attendanceSnap.data() : {};
 
-  // Build table rows
-  students.forEach(student => {
-    const record = dayData[student.id] || null;
+  renderTable();
+  renderPagination();
+}
+
+// ==========================
+// RENDER TABLE WITH COLORS
+// ==========================
+function renderTable() {
+  const tbody = document.getElementById("attendanceTableBody");
+  tbody.innerHTML = "";
+
+  const start = (currentPage - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+
+  const pageStudents = currentStudents.slice(start, end);
+
+  pageStudents.forEach(student => {
+    const record = currentDayData[student.id] || null;
 
     const inTime = record?.inTime || "-";
     const outTime = record?.outTime || "-";
     const status = record?.status || "Absent";
 
     const row = document.createElement("tr");
+
+    // Apply Green for Present / Red for Absent
+    const statusClass = status === "Present"
+      ? "status-green"
+      : "status-red";
+
     row.innerHTML = `
       <td>${student.id}</td>
       <td>${student.name || "-"}</td>
       <td>${inTime}</td>
       <td>${outTime}</td>
-      <td>${status}</td>
+      <td class="${statusClass}">${status}</td>
     `;
-    tableBody.appendChild(row);
+
+    tbody.appendChild(row);
   });
+}
+
+// ==========================
+// PAGINATION
+// ==========================
+function renderPagination() {
+  const totalPages = Math.ceil(currentStudents.length / rowsPerPage);
+
+  const container = document.getElementById("paginationContainer");
+  container.innerHTML = "";
+
+  if (totalPages <= 1) return;
+
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement("button");
+    btn.textContent = i;
+    btn.className = "pagination-btn";
+    if (i === currentPage) btn.classList.add("active");
+
+    btn.addEventListener("click", () => {
+      currentPage = i;
+      renderTable();
+      renderPagination();
+    });
+
+    container.appendChild(btn);
+  }
 }
 
 // ==========================
@@ -67,18 +123,10 @@ async function loadAttendance(date) {
 async function exportExcel() {
   const date = document.getElementById("attendanceDate").value;
 
-  const studentsSnap = await getDocs(collection(db, "students"));
-  const students = [];
-  studentsSnap.forEach(doc => students.push({ id: doc.id, ...doc.data() }));
-
-  const attendanceRef = doc(db, "attendance", date);
-  const attendanceSnap = await getDoc(attendanceRef);
-  const dayData = attendanceSnap.exists() ? attendanceSnap.data() : {};
-
   let csv = "ID,Name,IN,OUT,Status\n";
 
-  students.forEach(student => {
-    const record = dayData[student.id] || null;
+  currentStudents.forEach(student => {
+    const record = currentDayData[student.id] || null;
 
     const inTime = record?.inTime || "-";
     const outTime = record?.outTime || "-";

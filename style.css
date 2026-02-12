@@ -209,4 +209,32 @@ textarea:focus {
   background: #2e7d32; /* green active page */
   color: white;
 }
+/* Pagination container */
+#paginationContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap; /* allow wrapping if too many pages */
+}
+
+/* Pagination buttons */
+#paginationContainer .pagination-btn {
+  padding: 6px 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  background: #1976d2;
+  color: white;
+  font-weight: bold;
+  display: inline-block !important;   /* override global button block */
+  width: auto !important;             /* prevent full width */
+}
+
+/* Active page */
+#paginationContainer .pagination-btn.active {
+  background: #2e7d32; /* Green */
+}
+
 

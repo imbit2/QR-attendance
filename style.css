@@ -188,28 +188,25 @@ textarea:focus {
 
 /* Pagination Buttons */
 .pagination {
-  margin-top: 16px;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap; /* allows wrapping if many pages */
 }
 
-.pagination-btn {
-  padding: 6px 12px;
-  margin: 3px;
-  border: 1px solid #888;
-  background: white;
+.pagination button {
+  padding: 6px 14px;
+  border: none;
   cursor: pointer;
   border-radius: 4px;
-}
-
-.pagination-btn.active {
-  background: #4caf50;
+  background: #1976d2;
   color: white;
   font-weight: bold;
 }
 
-
-
-
-
-
+.pagination button.active {
+  background: #2e7d32; /* green active page */
+  color: white;
+}
 

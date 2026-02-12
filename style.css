@@ -174,6 +174,39 @@ textarea:focus {
   gap: 5px;
   font-size: 16px;
 }
+/* Present = Green */
+.status-green {
+  color: green;
+  font-weight: bold;
+}
+
+/* Absent = Red */
+.status-red {
+  color: red;
+  font-weight: bold;
+}
+
+/* Pagination Buttons */
+.pagination {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.pagination-btn {
+  padding: 6px 12px;
+  margin: 3px;
+  border: 1px solid #888;
+  background: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.pagination-btn.active {
+  background: #4caf50;
+  color: white;
+  font-weight: bold;
+}
+
 
 
 

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Attendance Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="page-container">
+
+  <!-- Page Title -->
+  <h2 class="page-title">Attendance Details</h2>
+
+  <!-- Date Selector -->
+  <label class="input-label">Select Date</label>
+  <input type="date" id="attendanceDate" class="input-field">
+
+  <!-- Export Button -->
+  <button class="primary-btn" style="margin-top: 12px;" onclick="exportExcel()">
+    Export to Excel
+  </button>
+
+  <!-- Attendance Table -->
+  <div class="card" style="margin-top: 18px;">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>IN</th>
+          <th>OUT</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="attendanceTableBody">
+        <!-- Rows will be injected here -->
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Page Script -->
+<script type="module" src="script.js"></script>
+<script type="module" src="attendance_details.js"></script>
+
+</body>
+</html>

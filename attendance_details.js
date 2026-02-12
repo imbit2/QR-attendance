@@ -100,24 +100,48 @@ function renderPagination() {
 
   if (totalPages <= 1) return;
 
-  // --- PREVIOUS BUTTON ---
-  const prevBtn = document.createElement("button");
-  prevBtn.textContent = "<";
-  prevBtn.className = "pagination-btn";
-  prevBtn.disabled = currentPage === 1;
+  // --- If pages are 5 or fewer, show simple pagination ---
+  if (totalPages <= 5) {
+    for (let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement("button");
+      btn.textContent = i;
+      btn.className = "pagination-btn";
+      if (i === currentPage) btn.classList.add("active");
 
-  prevBtn.addEventListener("click", () => {
-    if (currentPage > 1) {
-      currentPage--;
+      btn.addEventListener("click", () => {
+        currentPage = i;
+        renderTable();
+        renderPagination();
+      });
+
+      container.appendChild(btn);
+    }
+    return;
+  }
+
+  // --- Chunk Pagination Logic (5 per group) ---
+  const chunkSize = 5;
+  const currentChunk = Math.floor((currentPage - 1) / chunkSize);
+  const startPage = currentChunk * chunkSize + 1;
+  const endPage = Math.min(startPage + chunkSize - 1, totalPages);
+
+  // --- Previous Chunk Button (<) ---
+  if (startPage > 1) {
+    const prevChunkBtn = document.createElement("button");
+    prevChunkBtn.textContent = "<";
+    prevChunkBtn.className = "pagination-btn";
+
+    prevChunkBtn.addEventListener("click", () => {
+      currentPage = startPage - 1;
       renderTable();
       renderPagination();
-    }
-  });
+    });
 
-  container.appendChild(prevBtn);
+    container.appendChild(prevChunkBtn);
+  }
 
-  // --- PAGE NUMBER BUTTONS ---
-  for (let i = 1; i <= totalPages; i++) {
+  // --- Page Buttons in Current Chunk ---
+  for (let i = startPage; i <= endPage; i++) {
     const btn = document.createElement("button");
     btn.textContent = i;
     btn.className = "pagination-btn";
@@ -132,21 +156,20 @@ function renderPagination() {
     container.appendChild(btn);
   }
 
-  // --- NEXT BUTTON ---
-  const nextBtn = document.createElement("button");
-  nextBtn.textContent = ">";
-  nextBtn.className = "pagination-btn";
-  nextBtn.disabled = currentPage === totalPages;
+  // --- Next Chunk Button (>) ---
+  if (endPage < totalPages) {
+    const nextChunkBtn = document.createElement("button");
+    nextChunkBtn.textContent = ">";
+    nextChunkBtn.className = "pagination-btn";
 
-  nextBtn.addEventListener("click", () => {
-    if (currentPage < totalPages) {
-      currentPage++;
+    nextChunkBtn.addEventListener("click", () => {
+      currentPage = endPage + 1;
       renderTable();
       renderPagination();
-    }
-  });
+    });
 
-  container.appendChild(nextBtn);
+    container.appendChild(nextChunkBtn);
+  }
 }
 
 // ==========================
@@ -175,4 +198,5 @@ async function exportExcel() {
 }
 
 window.exportExcel = exportExcel;
+
 

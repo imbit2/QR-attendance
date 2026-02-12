@@ -11,6 +11,12 @@ import {
    deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+// Pagination Variables
+let currentPage = 1;
+let rowsPerPage = 10;
+let currentStudents = [];
+let currentDayData = {};
+
 /* =========================================================
    MAIN PAGE LOADER
 ========================================================= */
@@ -251,3 +257,4 @@ function renderPagination() {
 window.addEventListener("pageshow", event => {
   if (event.persisted) window.location.reload();
 });
+

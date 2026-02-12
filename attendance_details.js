@@ -49,7 +49,6 @@ async function loadAttendance(date) {
   currentDayData = attendanceSnap.exists() ? attendanceSnap.data() : {};
 
   renderTable();
-  renderPagination();
 }
 
 // ==========================
@@ -116,3 +115,4 @@ async function exportExcel() {
 }
 
 window.exportExcel = exportExcel;
+

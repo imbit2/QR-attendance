@@ -107,7 +107,7 @@ function renderPagination() {
 
   // PREVIOUS BUTTON
   const prevBtn = document.createElement("button");
-  prevBtn.textContent = "Previous";
+  prevBtn.textContent = "<";
   prevBtn.className = "pagination-btn";
   prevBtn.disabled = currentPage === 1;
   prevBtn.onclick = () => {
@@ -135,7 +135,7 @@ function renderPagination() {
 
   // NEXT BUTTON
   const nextBtn = document.createElement("button");
-  nextBtn.textContent = "Next";
+  nextBtn.textContent = ">";
   nextBtn.className = "pagination-btn";
   nextBtn.disabled = currentPage === totalPages;
   nextBtn.onclick = () => {
@@ -178,3 +178,4 @@ window.addEventListener("pageshow", async function (event) {
     await loadStudentsFromFirebase();
   }
 });
+

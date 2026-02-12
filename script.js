@@ -11,12 +11,6 @@ import {
    deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-// Pagination Variables
-let currentPage = 1;
-let rowsPerPage = 10;
-let currentStudents = [];
-let currentDayData = {};
-
 /* =========================================================
    MAIN PAGE LOADER
 ========================================================= */
@@ -36,7 +30,7 @@ autoDeleteAttendanceToday();
     }
 
     enforceAdminPermissions(role);
-  } renderPagination()
+  } 
 
 });
 /* =========================================================
@@ -169,93 +163,12 @@ export function today() {
   return new Date().toLocaleDateString("en-CA");
 }
 
-// ==========================
-// PAGINATION
-// ==========================
-function renderPagination() {
-  const totalPages = Math.ceil(currentStudents.length / rowsPerPage);
-  const container = document.getElementById("paginationContainer");
-  container.innerHTML = "";
-
-  if (totalPages <= 1) return;
-
-  // --- If pages are 5 or fewer, show simple pagination ---
-  if (totalPages <= 5) {
-    for (let i = 1; i <= totalPages; i++) {
-      const btn = document.createElement("button");
-      btn.textContent = i;
-      btn.className = "pagination-btn";
-      if (i === currentPage) btn.classList.add("active");
-
-      btn.addEventListener("click", () => {
-        currentPage = i;
-        renderTable();
-        renderPagination();
-      });
-
-      container.appendChild(btn);
-    }
-    return;
-  }
-
-  // --- Chunk Pagination Logic (5 per group) ---
-  const chunkSize = 5;
-  const currentChunk = Math.floor((currentPage - 1) / chunkSize);
-  const startPage = currentChunk * chunkSize + 1;
-  const endPage = Math.min(startPage + chunkSize - 1, totalPages);
-
-  // --- Previous Chunk Button (<) ---
-  if (startPage > 1) {
-    const prevChunkBtn = document.createElement("button");
-    prevChunkBtn.textContent = "<";
-    prevChunkBtn.className = "pagination-btn";
-
-    prevChunkBtn.addEventListener("click", () => {
-      currentPage = startPage - 1;
-      renderTable();
-      renderPagination();
-    });
-
-    container.appendChild(prevChunkBtn);
-  }
-
-  // --- Page Buttons in Current Chunk ---
-  for (let i = startPage; i <= endPage; i++) {
-    const btn = document.createElement("button");
-    btn.textContent = i;
-    btn.className = "pagination-btn";
-    if (i === currentPage) btn.classList.add("active");
-
-    btn.addEventListener("click", () => {
-      currentPage = i;
-      renderTable();
-      renderPagination();
-    });
-
-    container.appendChild(btn);
-  }
-
-  // --- Next Chunk Button (>) ---
-  if (endPage < totalPages) {
-    const nextChunkBtn = document.createElement("button");
-    nextChunkBtn.textContent = ">";
-    nextChunkBtn.className = "pagination-btn";
-
-    nextChunkBtn.addEventListener("click", () => {
-      currentPage = endPage + 1;
-      renderTable();
-      renderPagination();
-    });
-
-    container.appendChild(nextChunkBtn);
-  }
-}
-
 /* =========================================================
    SAFARI BACK-CACHE FIX
 ========================================================= */
 window.addEventListener("pageshow", event => {
   if (event.persisted) window.location.reload();
 });
+
 
 

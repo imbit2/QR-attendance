@@ -123,7 +123,7 @@ function renderAttendancePage() {
 
   pageItems.forEach(r => {
     html += `
-      <div class="attendance-item">
+      <div>
         <strong>${r.date}</strong>
         &nbsp; | &nbsp; ${r.status}
         &nbsp; | &nbsp; In: ${r.inTime}
@@ -136,7 +136,7 @@ function renderAttendancePage() {
 }
 
 function renderAttendancePagination() {
-  const container = document.getElementById("attendancePagination");
+  const container = document.getElementById("paginationContainer");
   if (!container) return;
 
   container.innerHTML = "";
@@ -185,4 +185,5 @@ function renderAttendancePagination() {
   };
   container.appendChild(next);
 }
+
 

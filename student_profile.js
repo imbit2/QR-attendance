@@ -57,69 +57,130 @@ async function loadStudent() {
 }
 
 loadStudent();
-
 /* ==========================================================
-      LOAD ATTENDANCE HISTORY (FIRESTORE)
+      LOAD ATTENDANCE HISTORY (WITH PAGINATION)
 ========================================================== */
-// Expected Firestore structure:
-// attendance
-//    └── 2026-02-05
-//          └── studentId { status, scans: ["09:00","11:00"] }
+
+let attendanceHistory = [];   // store all records
+let attendancePage = 1;
+const attendancePerPage = 7;
 
 async function loadAttendanceHistory() {
   const historyDiv = document.getElementById("attendanceHistory");
-  let html = "";
-  let found = false;
 
   try {
-    const attendanceCol = collection(db, "attendance");
-    const datesSnapshot = await getDocs(attendanceCol);
+    const datesSnapshot = await getDocs(collection(db, "attendance"));
 
-    let dateList = [];
+    let records = [];
 
-    datesSnapshot.forEach(d => dateList.push(d.id));
+    datesSnapshot.forEach(docSnap => {
+      const date = docSnap.id;
+      const data = docSnap.data();
 
-    // Sort ascending
-    dateList.sort();
+      if (data[studentId]) {
+        const rec = data[studentId];
 
-    for (const date of dateList) {
-      const recordRef = doc(db, "attendance", date);
-      const recordSnap = await getDoc(recordRef);
-
-      if (recordSnap.exists()) {
-        const recordData = recordSnap.data();
-
-        const studentRecord = recordData[studentId];
-
-        if (studentRecord) {
-          found = true;
-
-          const inTime = studentRecord.scans?.[0] || "-";
-          const outTime = studentRecord.scans?.[1] || "-";
-
-          html += `
-            <div style="margin-bottom:8px;">
-              <strong>${date}</strong>
-              &nbsp; | &nbsp; ${studentRecord.status}
-              &nbsp; | &nbsp; In: ${inTime}
-              &nbsp; | &nbsp; Out: ${outTime}
-            </div>
-          `;
-        }
+        records.push({
+          date,
+          status: rec.status,
+          inTime: rec.scans?.[0] || "-",
+          outTime: rec.scans?.[1] || "-"
+        });
       }
+    });
+
+    if (records.length === 0) {
+      historyDiv.innerHTML = "<p>No attendance record found</p>";
+      return;
     }
 
-    if (!found) {
-      html = "<p>No attendance record found</p>";
-    }
+    // Sort latest first
+    attendanceHistory = records.sort((a, b) => (a.date < b.date ? 1 : -1));
 
-    historyDiv.innerHTML = html;
+    renderAttendancePage();
+    renderAttendancePagination();
 
   } catch (err) {
     console.error(err);
     historyDiv.innerHTML = "<p>Error loading attendance history</p>";
   }
 }
+/* ==========================================================
+      ATTENDANCE PAGINATION
+========================================================== */
 
-loadAttendanceHistory();
+function renderAttendancePage() {
+  const historyDiv = document.getElementById("attendanceHistory");
+  historyDiv.innerHTML = "";
 
+  const start = (attendancePage - 1) * attendancePerPage;
+  const end = start + attendancePerPage;
+
+  const pageItems = attendanceHistory.slice(start, end);
+
+  let html = "";
+
+  pageItems.forEach(r => {
+    html += `
+      <div class="attendance-item">
+        <strong>${r.date}</strong>
+        &nbsp; | &nbsp; ${r.status}
+        &nbsp; | &nbsp; In: ${r.inTime}
+        &nbsp; | &nbsp; Out: ${r.outTime}
+      </div>
+    `;
+  });
+
+  historyDiv.innerHTML = html;
+}
+
+function renderAttendancePagination() {
+  const container = document.getElementById("attendancePagination");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  const totalPages = Math.ceil(attendanceHistory.length / attendancePerPage);
+  if (totalPages <= 1) return;
+
+  /* PREV BUTTON */
+  const prev = document.createElement("button");
+  prev.textContent = "<<";
+  prev.disabled = attendancePage === 1;
+  prev.onclick = () => {
+    attendancePage--;
+    renderAttendancePage();
+    renderAttendancePagination();
+  };
+  container.appendChild(prev);
+
+  /* PAGE NUMBERS (MAX 5) */
+  let maxPages = 5;
+  let start = Math.max(1, attendancePage - 2);
+  let end = Math.min(totalPages, start + maxPages - 1);
+
+  if (end - start < 4) start = Math.max(1, end - 4);
+
+  for (let i = start; i <= end; i++) {
+    const btn = document.createElement("button");
+    btn.textContent = i;
+    btn.className = i === attendancePage ? "active-page" : "";
+    btn.onclick = () => {
+      attendancePage = i;
+      renderAttendancePage();
+      renderAttendancePagination();
+    };
+    container.appendChild(btn);
+  }
+
+  /* NEXT BUTTON */
+  const next = document.createElement("button");
+  next.textContent = ">>";
+  next.disabled = attendancePage === totalPages;
+  next.onclick = () => {
+    attendancePage++;
+    renderAttendancePage();
+    renderAttendancePagination();
+  };
+  container.appendChild(next);
+}

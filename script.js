@@ -15,12 +15,11 @@ import {
    MAIN PAGE LOADER
 ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
-autoDeleteAttendanceToday();
+  autoDeleteAttendanceToday();
+  checkAutoLogout();  // <--- ADD THIS LINE
+
   const filename = window.location.pathname.split("/").pop();
 
-  /* ---------------------------------------------
-     1️⃣ LOGIN PROTECTION (runs on all pages except login)
-  --------------------------------------------- */
   if (filename !== "login.html") {
     const role = localStorage.getItem("logged_role");
 
@@ -30,9 +29,29 @@ autoDeleteAttendanceToday();
     }
 
     enforceAdminPermissions(role);
-  } 
-
+  }
 });
+/* =========================================================
+   AUTO LOGOUT AFTER 8 HOURS
+========================================================= */
+function checkAutoLogout() {
+  const loginTime = localStorage.getItem("loginTime");
+
+  // Not logged in → nothing to check
+  if (!loginTime) return;
+
+  const now = Date.now();
+  const maxSession = 8 * 60 * 60 * 1000;  // 8 hours in ms
+
+  if (now - Number(loginTime) > maxSession) {
+    // Session expired → force logout
+    localStorage.removeItem("logged_role");
+    localStorage.removeItem("loginTime");
+
+    alert("Your session expired. You have been logged out automatically.");
+    window.location.href = "login.html";
+  }
+}
 /* =========================================================
    AUTO DELETE YESTERDAY'S attendance_today
 ========================================================= */
@@ -169,6 +188,7 @@ export function today() {
 window.addEventListener("pageshow", event => {
   if (event.persisted) window.location.reload();
 });
+
 
 
 

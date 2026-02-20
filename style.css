@@ -244,3 +244,10 @@ textarea:focus {
   color: white !important;
   border-color: #1677ff;
 }
+.attendance-item {
+  margin-bottom: 8px;
+  padding: 6px;
+  background: #fafafa;
+  border-radius: 5px;
+  border: 1px solid #eee;
+}

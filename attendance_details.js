@@ -89,89 +89,82 @@ function renderTable() {
     tbody.appendChild(row);
   });
 }
-
+/* =====================================================
+   CHANGE PAGE (MAIN PAGINATION FN)
+===================================================== */
+function changePage(page) {
+  currentPage = page;
+  renderTable();
+  renderPagination();
+}
 // ==========================
 // PAGINATION
 // ==========================
 function renderPagination() {
-  const totalPages = Math.ceil(currentStudents.length / rowsPerPage);
   const container = document.getElementById("paginationContainer");
   container.innerHTML = "";
 
+  const totalPages = Math.ceil(currentStudents.length / rowsPerPage);
   if (totalPages <= 1) return;
 
-  // --- If pages are 5 or fewer, show simple pagination ---
-  if (totalPages <= 5) {
-    for (let i = 1; i <= totalPages; i++) {
-      const btn = document.createElement("button");
-      btn.textContent = i;
-      btn.className = "pagination-btn";
-      if (i === currentPage) btn.classList.add("active");
+  /* ---- PREVIOUS BUTTON ---- */
+  let prevBtn = document.createElement("button");
+  prevBtn.textContent = "<<";
+  prevBtn.className = currentPage === 1 ? "disabled" : "";
+  prevBtn.onclick = () => {
+    if (currentPage > 1) changePage(currentPage - 1);
+  };
+  container.appendChild(prevBtn);
 
-      btn.addEventListener("click", () => {
-        currentPage = i;
-        renderTable();
-        renderPagination();
-      });
+  /* ---- PAGE RANGE ---- */
+  let maxPagesToShow = 5;
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
 
-      container.appendChild(btn);
-    }
-    return;
+  if (endPage - startPage < 4) {
+    startPage = Math.max(1, endPage - 4);
   }
 
-  // --- Chunk Pagination Logic (5 per group) ---
-  const chunkSize = 5;
-  const currentChunk = Math.floor((currentPage - 1) / chunkSize);
-  const startPage = currentChunk * chunkSize + 1;
-  const endPage = Math.min(startPage + chunkSize - 1, totalPages);
-
-  // --- Previous Chunk Button (<) ---
+  /* ---- FIRST PAGE + ... ---- */
   if (startPage > 1) {
-    const prevChunkBtn = document.createElement("button");
-    prevChunkBtn.textContent = "<";
-    prevChunkBtn.className = "pagination-btn";
-
-    prevChunkBtn.addEventListener("click", () => {
-      currentPage = startPage - 1;
-      renderTable();
-      renderPagination();
-    });
-
-    container.appendChild(prevChunkBtn);
+    addPageButton(1);
+    if (startPage > 2) addEllipsis();
   }
 
-  // --- Page Buttons in Current Chunk ---
-  for (let i = startPage; i <= endPage; i++) {
-    const btn = document.createElement("button");
+  /* ---- MIDDLE BUTTONS ---- */
+  for (let i = startPage; i <= endPage; i++) addPageButton(i);
+
+  /* ---- LAST PAGE + ... ---- */
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) addEllipsis();
+    addPageButton(totalPages);
+  }
+
+  /* ---- NEXT BUTTON ---- */
+  let nextBtn = document.createElement("button");
+  nextBtn.textContent = ">>";
+  nextBtn.className = currentPage === totalPages ? "disabled" : "";
+  nextBtn.onclick = () => {
+    if (currentPage < totalPages) changePage(currentPage + 1);
+  };
+  container.appendChild(nextBtn);
+
+  function addPageButton(i) {
+    let btn = document.createElement("button");
     btn.textContent = i;
-    btn.className = "pagination-btn";
-    if (i === currentPage) btn.classList.add("active");
-
-    btn.addEventListener("click", () => {
-      currentPage = i;
-      renderTable();
-      renderPagination();
-    });
-
+    btn.className = (i === currentPage) ? "active-page" : "";
+    btn.onclick = () => changePage(i);
     container.appendChild(btn);
   }
 
-  // --- Next Chunk Button (>) ---
-  if (endPage < totalPages) {
-    const nextChunkBtn = document.createElement("button");
-    nextChunkBtn.textContent = ">";
-    nextChunkBtn.className = "pagination-btn";
-
-    nextChunkBtn.addEventListener("click", () => {
-      currentPage = endPage + 1;
-      renderTable();
-      renderPagination();
-    });
-
-    container.appendChild(nextChunkBtn);
+  function addEllipsis() {
+    let span = document.createElement("button");
+    span.textContent = "...";
+    span.className = "disabled";
+    span.style.cursor = "default";
+    container.appendChild(span);
   }
 }
-
 // ==========================
 // EXPORT CSV
 // ==========================
@@ -198,5 +191,3 @@ async function exportExcel() {
 }
 
 window.exportExcel = exportExcel;
-
-

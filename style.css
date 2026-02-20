@@ -215,3 +215,32 @@ textarea:focus {
   opacity: 0.5;
   cursor: not-allowed;
 }
+#paginationContainer {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+#paginationContainer button {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #d0d7e2;
+  background: #f8fbff;
+  font-size: 16px;
+  cursor: pointer;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#paginationContainer button:hover {
+  background: #e7efff;
+}
+
+#paginationContainer button.active-page {
+  background: #1677ff;
+  color: white !important;
+  border-color: #1677ff;
+}

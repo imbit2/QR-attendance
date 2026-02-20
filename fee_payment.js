@@ -21,9 +21,8 @@ async function getStudents() {
    FETCH FEES OF A STUDENT FOR A YEAR
 ============================================================ */
 async function getFees(year, studentId) {
-  const ref = doc(db, "fees", year, "students", studentId);
+  const ref = doc(db, "fees", year.toString(), "students", studentId);
   const snap = await getDoc(ref);
-
   return snap.exists() ? snap.data() : null;
 }
 
@@ -31,8 +30,7 @@ async function getFees(year, studentId) {
    SAVE UPDATED FEES
 ============================================================ */
 async function saveFeeStatus(year, studentId, month, value) {
-  const ref = doc(db, "fees", year, "students", studentId);
-
+  const ref = doc(db, "fees", year.toString(), "students", studentId);
   await setDoc(ref, { [month]: value }, { merge: true });
 }
 
@@ -50,7 +48,7 @@ async function loadPaymentPage() {
   const students = await getStudents();
   const student = students.find(s => s.id == studentId);
 
-  const year = new Date().getFullYear();
+  const year = new Date().getFullYear().toString();
   let fees = await getFees(year, studentId);
 
   // Auto-create missing fee record
@@ -60,9 +58,12 @@ async function loadPaymentPage() {
     await setDoc(doc(db, "fees", year, "students", studentId), fees);
   }
 
-  document.getElementById("studentID").textContent = `Student ID: ${student.id}`;
-  document.getElementById("studentTitle").textContent = `Fee Payment for: ${student.name}`;
-  document.getElementById("yearTitle").textContent = `Year: ${year}`;
+  document.getElementById("studentID").textContent =
+    `Student ID: ${student.id}`;
+  document.getElementById("studentTitle").textContent =
+    `Fee Payment for: ${student.name}`;
+  document.getElementById("yearTitle").textContent =
+    `Year: ${year}`;
 
   const table = document.getElementById("paymentTable");
   table.innerHTML = "";
@@ -95,7 +96,7 @@ async function loadPaymentPage() {
    UPDATE STATUS
 ============================================================ */
 window.setStatus = async function (studentId, month, value) {
-  const year = new Date().getFullYear();
+  const year = new Date().getFullYear().toString();
 
   await saveFeeStatus(year, studentId, month, value);
 

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Fee Payment</title>
+
+  <style>
+    .mark-buttons {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .tick, .cross {
+      cursor: pointer;
+      padding: 4px 8px;
+      font-size: 14px;
+      border-radius: 4px;
+      font-weight: bold;
+      width: 40px;
+      text-align: center;
+    }
+
+    .tick { background: #27ae60; color: white; }
+    .cross { background: #c0392b; color: white; }
+
+    .status-box {
+      padding: 4px 10px;
+      display: inline-block;
+      border-radius: 4px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .paid-box { background: #2ecc71; }
+    .due-box { background: #e74c3c; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <h2 id="studentID">Student ID</h2>
+    <h3 id="studentTitle">Fee Payment</h3>
+    <h3 id="yearTitle"></h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Mark</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="paymentTable"></tbody>
+    </table>
+
+  </div> <!-- ✅ correct closing -->
+
+  <!-- Scripts -->
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="script.js"></script>
+  <script type="module" src="fee_payment.js"></script>
+
+</body>
+</html>

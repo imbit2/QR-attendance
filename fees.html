@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Fees Management</title>
+</head>
+
+<body>
+<div class="page-container">
+
+  <h2>Fees Management</h2>
+
+  <label>Select Year:</label>
+  <select id="yearDropdown"></select>
+
+  <button onclick="exportFeesExcel()">Export Excel</button>
+
+  <table id="summaryTable">
+    <thead>
+      <tr>
+        <th>Student ID</th>
+        <th>Name</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+</div>
+
+<!-- Load Firebase config -->
+<script type="module" src="firebase-config.js"></script>
+
+<!-- Load Fees logic -->
+<script type="module" src="fees.js"></script>
+
+</body>
+</html>

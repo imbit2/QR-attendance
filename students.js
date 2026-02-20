@@ -1,4 +1,4 @@
-// students.js (FIREBASE VERSION + PAGINATION)
+// students.js (FIREBASE VERSION + FIXED PAGINATION)
 
 import { db } from "./firebase-config.js";
 import {
@@ -24,9 +24,8 @@ async function loadStudentsFromFirebase() {
       ...doc.data()
     }));
 
-    window.studentsCache = students;
-
     filteredStudents = [...students];
+
     renderTable();
     renderPagination();
 
@@ -91,26 +90,34 @@ function renderTable() {
 }
 
 /* =====================================================
-   PAGINATION (5 buttons + prev + next)
+   CHANGE PAGE (MAIN PAGINATION FN)
+===================================================== */
+function changePage(page) {
+  currentPage = page;
+  renderTable();
+  renderPagination();
+}
+
+/* =====================================================
+   PAGINATION (5 main buttons + PREV + NEXT + ELLIPSIS)
 ===================================================== */
 function renderPagination() {
   const container = document.getElementById("paginationContainer");
   container.innerHTML = "";
 
-  const totalPages = Math.ceil(studentsList.length / itemsPerPage);
-
+  const totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
   if (totalPages <= 1) return;
 
-  // ---- PREVIOUS BUTTON ----
+  /* ---- PREVIOUS BUTTON ---- */
   let prevBtn = document.createElement("button");
   prevBtn.textContent = "<<";
   prevBtn.className = currentPage === 1 ? "disabled" : "";
   prevBtn.onclick = () => {
-    if (currentPage > 1) loadPage(currentPage - 1);
+    if (currentPage > 1) changePage(currentPage - 1);
   };
   container.appendChild(prevBtn);
 
-  // ---- PAGE RANGE LOGIC ----
+  /* ---- PAGE RANGE CALCULATION ---- */
   let maxPagesToShow = 5;
   let startPage = Math.max(1, currentPage - 2);
   let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
@@ -119,36 +126,36 @@ function renderPagination() {
     startPage = Math.max(1, endPage - 4);
   }
 
-  // ---- SHOW FIRST PAGE + "..." ----
+  /* ---- FIRST PAGE + "..." ---- */
   if (startPage > 1) {
     addPageButton(1);
     if (startPage > 2) addEllipsis();
   }
 
-  // ---- MIDDLE PAGES ----
+  /* ---- MIDDLE PAGES ---- */
   for (let i = startPage; i <= endPage; i++) addPageButton(i);
 
-  // ---- SHOW LAST PAGE + "..." ----
+  /* ---- LAST PAGE + "..." ---- */
   if (endPage < totalPages) {
     if (endPage < totalPages - 1) addEllipsis();
     addPageButton(totalPages);
   }
 
-  // ---- NEXT BUTTON ----
+  /* ---- NEXT BUTTON ---- */
   let nextBtn = document.createElement("button");
   nextBtn.textContent = ">>";
   nextBtn.className = currentPage === totalPages ? "disabled" : "";
   nextBtn.onclick = () => {
-    if (currentPage < totalPages) loadPage(currentPage + 1);
+    if (currentPage < totalPages) changePage(currentPage + 1);
   };
   container.appendChild(nextBtn);
 
-  /* Helper Functions */
+  /* ---- Helper Functions ---- */
   function addPageButton(i) {
     let btn = document.createElement("button");
     btn.textContent = i;
     btn.className = (i === currentPage) ? "active-page" : "";
-    btn.onclick = () => loadPage(i);
+    btn.onclick = () => changePage(i);
     container.appendChild(btn);
   }
 
@@ -177,6 +184,7 @@ function searchStudent() {
   renderPagination();
 }
 
+/* Clear search */
 window.clearSearch = function () {
   document.getElementById("searchInput").value = "";
   filteredStudents = [...students];
@@ -185,13 +193,9 @@ window.clearSearch = function () {
   renderPagination();
 };
 
-/* =====================================================
-   FORCE REFRESH WHEN RETURNING TO PAGE
-===================================================== */
+/* Force reload when navigating back */
 window.addEventListener("pageshow", async function (event) {
   if (event.persisted) {
     await loadStudentsFromFirebase();
   }
 });
-
-

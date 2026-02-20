@@ -94,56 +94,71 @@ function renderTable() {
    PAGINATION (5 buttons + prev + next)
 ===================================================== */
 function renderPagination() {
-  const totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
   const container = document.getElementById("paginationContainer");
-
   container.innerHTML = "";
+
+  const totalPages = Math.ceil(studentsList.length / itemsPerPage);
+
   if (totalPages <= 1) return;
 
-  const chunkSize = 5;
-  const currentChunk = Math.floor((currentPage - 1) / chunkSize);
-  const startPage = currentChunk * chunkSize + 1;
-  const endPage = Math.min(startPage + chunkSize - 1, totalPages);
-
-  // PREVIOUS BUTTON
-  const prevBtn = document.createElement("button");
-  prevBtn.textContent = "<";
-  prevBtn.className = "pagination-btn";
-  prevBtn.disabled = currentPage === 1;
+  // ---- PREVIOUS BUTTON ----
+  let prevBtn = document.createElement("button");
+  prevBtn.textContent = "<<";
+  prevBtn.className = currentPage === 1 ? "disabled" : "";
   prevBtn.onclick = () => {
-    if (currentPage > 1) currentPage--;
-    renderTable();
-    renderPagination();
+    if (currentPage > 1) loadPage(currentPage - 1);
   };
   container.appendChild(prevBtn);
 
-  // PAGE NUMBERS (5)
-  for (let i = startPage; i <= endPage; i++) {
-    const btn = document.createElement("button");
+  // ---- PAGE RANGE LOGIC ----
+  let maxPagesToShow = 5;
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+  if (endPage - startPage < 4) {
+    startPage = Math.max(1, endPage - 4);
+  }
+
+  // ---- SHOW FIRST PAGE + "..." ----
+  if (startPage > 1) {
+    addPageButton(1);
+    if (startPage > 2) addEllipsis();
+  }
+
+  // ---- MIDDLE PAGES ----
+  for (let i = startPage; i <= endPage; i++) addPageButton(i);
+
+  // ---- SHOW LAST PAGE + "..." ----
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) addEllipsis();
+    addPageButton(totalPages);
+  }
+
+  // ---- NEXT BUTTON ----
+  let nextBtn = document.createElement("button");
+  nextBtn.textContent = ">>";
+  nextBtn.className = currentPage === totalPages ? "disabled" : "";
+  nextBtn.onclick = () => {
+    if (currentPage < totalPages) loadPage(currentPage + 1);
+  };
+  container.appendChild(nextBtn);
+
+  /* Helper Functions */
+  function addPageButton(i) {
+    let btn = document.createElement("button");
     btn.textContent = i;
-    btn.className = "pagination-btn";
-    if (i === currentPage) btn.classList.add("active");
-
-    btn.onclick = () => {
-      currentPage = i;
-      renderTable();
-      renderPagination();
-    };
-
+    btn.className = (i === currentPage) ? "active-page" : "";
+    btn.onclick = () => loadPage(i);
     container.appendChild(btn);
   }
 
-  // NEXT BUTTON
-  const nextBtn = document.createElement("button");
-  nextBtn.textContent = ">";
-  nextBtn.className = "pagination-btn";
-  nextBtn.disabled = currentPage === totalPages;
-  nextBtn.onclick = () => {
-    if (currentPage < totalPages) currentPage++;
-    renderTable();
-    renderPagination();
-  };
-  container.appendChild(nextBtn);
+  function addEllipsis() {
+    let span = document.createElement("button");
+    span.textContent = "...";
+    span.className = "disabled";
+    span.style.cursor = "default";
+    container.appendChild(span);
+  }
 }
 
 /* =====================================================
@@ -178,4 +193,5 @@ window.addEventListener("pageshow", async function (event) {
     await loadStudentsFromFirebase();
   }
 });
+
 

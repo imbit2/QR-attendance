@@ -15,7 +15,7 @@
   <select id="yearDropdown"></select>
 
   <button onclick="exportFeesExcel()">Export Excel</button>
-
+  <div>
   <table id="summaryTable">
     <thead>
       <tr>
@@ -27,10 +27,12 @@
     <tbody></tbody>
   </table>
 <div id="paginationContainer" class="pagination"></div>
+  </div>
 </div>
 
 <!-- Load Firebase config -->
 <script type="module" src="firebase-config.js"></script>
+<script type="module" src="script.js"></script>
 
 <!-- Load Fees logic -->
 <script type="module" src="fees.js"></script>
@@ -38,4 +40,5 @@
 </body>
 
 </html>
+
 

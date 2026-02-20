@@ -57,6 +57,7 @@ async function loadStudent() {
 }
 
 loadStudent();
+loadAttendanceHistory();
 /* ==========================================================
       LOAD ATTENDANCE HISTORY (WITH PAGINATION)
 ========================================================== */
@@ -184,3 +185,4 @@ function renderAttendancePagination() {
   };
   container.appendChild(next);
 }
+

@@ -6,17 +6,20 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-// =========================
-// Fetch all students
-// =========================
+/* =====================================================
+   FETCH STUDENTS (IMPORTANT FIX)
+===================================================== */
 async function getStudents() {
   const snapshot = await getDocs(collection(db, "students"));
-  return snapshot.docs.map(d => d.data());
+  return snapshot.docs.map(d => ({
+    id: d.id,      // ✔ FIXED — include document ID
+    ...d.data()
+  }));
 }
 
-// =========================
-// Fetch fees for a year
-// =========================
+/* =====================================================
+   FETCH FEES FOR YEAR
+===================================================== */
 async function getFeesForYear(year) {
   const ref = collection(db, "fees", year, "students");
   const snapshot = await getDocs(ref);
@@ -29,64 +32,75 @@ async function getFeesForYear(year) {
   return data;
 }
 
-// =========================
-// Save student fees
-// =========================
+/* =====================================================
+   SAVE / UPDATE STUDENT FEES
+===================================================== */
 async function saveStudentFees(year, studentId, data) {
+  if (!studentId || !year) {
+    console.error("❌ Invalid Firestore Path:", { year, studentId });
+    return;
+  }
+
   await setDoc(
-    doc(db, "fees", year, "students", studentId),
+    doc(db, "fees", year.toString(), "students", studentId.toString()),
     data,
     { merge: true }
   );
 }
 
-// =========================
-// MONTHS
-// =========================
-const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+/* =====================================================
+   MONTHS
+===================================================== */
+const months = [
+  "Jan","Feb","Mar","Apr","May","Jun",
+  "Jul","Aug","Sep","Oct","Nov","Dec"
+];
 
-// =========================
-// ON LOAD
-// =========================
+/* =====================================================
+   ON PAGE LOAD
+===================================================== */
 document.addEventListener("DOMContentLoaded", () => {
   loadYearDropdown();
   loadStudentTable();
 });
 
-// =========================
-// YEAR DROPDOWN
-// =========================
+/* =====================================================
+   YEAR DROPDOWN
+===================================================== */
 async function loadYearDropdown() {
   let dropdown = document.getElementById("yearDropdown");
-  let currentYear = new Date().getFullYear();
+  let currentYear = new Date().getFullYear().toString();
 
   dropdown.innerHTML = "";
 
-  let opt = document.createElement("option");
-  opt.value = currentYear;
-  opt.textContent = currentYear;
-  dropdown.appendChild(opt);
+  let option = document.createElement("option");
+  option.value = currentYear;
+  option.textContent = currentYear;
+  dropdown.appendChild(option);
 
   dropdown.value = currentYear;
 
   dropdown.addEventListener("change", () => loadStudentTable());
 }
 
-// =========================
-// STUDENT TABLE
-// =========================
+/* =====================================================
+   LOAD STUDENT TABLE
+===================================================== */
 async function loadStudentTable() {
   let tbody = document.querySelector("#summaryTable tbody");
   tbody.innerHTML = "";
 
   let students = await getStudents();
   let year = document.getElementById("yearDropdown").value;
+
+  if (!year) year = new Date().getFullYear().toString(); // ✔ safer
+
   let fees = await getFeesForYear(year);
 
   for (let stu of students) {
-    if (!stu.name.trim()) continue;
+    if (!stu.name || !stu.id) continue;
 
-    // create default fee record if missing
+    // If fee record missing — create it
     if (!fees[stu.id]) {
       let defaultData = {};
       months.forEach(m => defaultData[m] = "Due");
@@ -102,7 +116,7 @@ async function loadStudentTable() {
       <td>
         <a href="fee_payment.html"
            onclick="openFeePayment('${stu.id}')">
-           Manage
+          Manage
         </a>
       </td>
     `;
@@ -111,25 +125,28 @@ async function loadStudentTable() {
   }
 }
 
-// =========================
-// PAYMENT PAGE LINK
-// =========================
-function openFeePayment(studentId) {
+/* =====================================================
+   PAYMENT PAGE LINK
+===================================================== */
+window.openFeePayment = function (studentId) {
   localStorage.setItem("feeSelectedStudent", studentId);
-}
+};
 
-// =========================
-// EXCEL EXPORT
-// =========================
-async function exportFeesExcel() {
+/* =====================================================
+   EXPORT EXCEL (CSV)
+===================================================== */
+window.exportFeesExcel = async function () {
   let year = document.getElementById("yearDropdown").value;
+  if (!year) year = new Date().getFullYear().toString();
+
   let fees = await getFeesForYear(year);
   let students = await getStudents();
 
   let rows = [];
 
   rows.push([
-    "Student ID","Name","Jan","Feb","Mar","Apr","May",
+    "Student ID", "Name",
+    "Jan","Feb","Mar","Apr","May",
     "Jun","Jul","Aug","Sep","Oct","Nov","Dec"
   ]);
 
@@ -146,13 +163,13 @@ async function exportFeesExcel() {
     rows.push(row);
   });
 
-  // Convert → CSV
+  // Convert to CSV
   let csv = rows.map(r => r.join(",")).join("\n");
-
   let blob = new Blob([csv], { type: "text/csv" });
   let url = URL.createObjectURL(blob);
+
   let a = document.createElement("a");
   a.href = url;
   a.download = `Fees_${year}.csv`;
   a.click();
-}
+};

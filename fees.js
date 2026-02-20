@@ -135,7 +135,7 @@ function renderPagination() {
 
   // ---- PREVIOUS BUTTON ----
   let prevBtn = document.createElement("button");
-  prevBtn.textContent = "Previous";
+  prevBtn.textContent = "<<";
   prevBtn.className = currentPage === 1 ? "disabled" : "";
   prevBtn.onclick = () => {
     if (currentPage > 1) loadPage(currentPage - 1);
@@ -168,7 +168,7 @@ function renderPagination() {
 
   // ---- NEXT BUTTON ----
   let nextBtn = document.createElement("button");
-  nextBtn.textContent = "Next ›";
+  nextBtn.textContent = ">>";
   nextBtn.className = currentPage === totalPages ? "disabled" : "";
   nextBtn.onclick = () => {
     if (currentPage < totalPages) loadPage(currentPage + 1);
@@ -227,4 +227,5 @@ window.exportFeesExcel = async function () {
   a.download = `Fees_${year}.csv`;
   a.click();
 };
+
 

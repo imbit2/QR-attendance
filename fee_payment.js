@@ -10,7 +10,7 @@ import {
 const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 /* ============================================================
-   FETCH STUDENT LIST FROM FIRESTORE
+   FETCH STUDENT LIST
 ============================================================ */
 async function getStudents() {
   const snap = await getDocs(collection(db, "students"));
@@ -18,7 +18,7 @@ async function getStudents() {
 }
 
 /* ============================================================
-   FETCH FEES OF A STUDENT FOR A YEAR
+   FETCH FEES FOR YEAR
 ============================================================ */
 async function getFees(year, studentId) {
   const ref = doc(db, "fees", year.toString(), "students", studentId);
@@ -27,7 +27,7 @@ async function getFees(year, studentId) {
 }
 
 /* ============================================================
-   SAVE UPDATED FEE STATUS OR AMOUNT
+   SAVE STATUS OR AMOUNT
 ============================================================ */
 async function saveFeeField(year, studentId, month, field, value) {
   const ref = doc(db, "fees", year.toString(), "students", studentId);
@@ -51,7 +51,7 @@ async function loadPaymentPage() {
   const year = new Date().getFullYear().toString();
   let fees = await getFees(year, studentId);
 
-  // Auto-create missing record
+  // Auto create missing record
   if (!fees) {
     fees = {};
     months.forEach(m => (fees[m] = { status: "Due", amount: "" }));
@@ -72,19 +72,7 @@ async function loadPaymentPage() {
     row.innerHTML = `
       <td>${month}</td>
 
-      <td>
-        <div class="mark-buttons">
-          <button class="tick" onclick="setStatus('${studentId}','${month}','Paid')">✔</button>
-          <button class="cross" onclick="setStatus('${studentId}','${month}','Due')">✖</button>
-        </div>
-      </td>
-
-      <td>
-        <span class="status-box ${entry.status === "Paid" ? "paid-box" : "due-box"}">
-          ${entry.status}
-        </span>
-      </td>
-
+      <!-- AMOUNT COLUMN (2nd) -->
       <td>
         <div style="display:flex; gap:4px;">
           <input 
@@ -100,6 +88,21 @@ async function loadPaymentPage() {
           >💾</button>
         </div>
       </td>
+
+      <!-- MARK BUTTONS COLUMN (3rd) -->
+      <td>
+        <div class="mark-buttons">
+          <button class="tick" onclick="setStatus('${studentId}','${month}','Paid')">✔</button>
+          <button class="cross" onclick="setStatus('${studentId}','${month}','Due')">✖</button>
+        </div>
+      </td>
+
+      <!-- STATUS COLUMN (4th) -->
+      <td>
+        <span class="status-box ${entry.status === "Paid" ? "paid-box" : "due-box"}">
+          ${entry.status}
+        </span>
+      </td>
     `;
     table.appendChild(row);
   });
@@ -111,7 +114,7 @@ async function loadPaymentPage() {
 window.setStatus = async function (studentId, month, value) {
   const year = new Date().getFullYear().toString();
   await saveFeeField(year, studentId, month, "status", value);
-  loadPaymentPage();
+  loadPaymentPage(); // refresh UI
 };
 
 /* ============================================================

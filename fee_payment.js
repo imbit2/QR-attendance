@@ -98,7 +98,7 @@ async function loadPaymentPage() {
           >
           <button 
             onclick="saveAmount('${studentId}', '${month}')"
-            style="padding:4px 6px; background:#3498db; color:white; border:none; border-radius:4px; cursor:pointer;"
+            style="padding:4px 4px; background:#3498db; color:white; border:none; border-radius:4px; cursor:pointer;"
           >💾</button>
         </div>
       </td>
@@ -178,6 +178,7 @@ Thank you!`;
   let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 };
+
 
 
 

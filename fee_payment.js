@@ -99,9 +99,9 @@ async function loadPaymentPage() {
         <button class="btn-red" onclick="setStatus('${studentId}','${month}','Due')">✖</button>
       </td>
 
-      <td class="cell-status">
-        <span class="status-tag ${status === "Paid" ? "paid" : "due"}">${status}</span> </td>
-        <td>
+      <td>
+        <span class="status-tag ${status === "Paid" ? "paid" : "due"}">${status}</span>
+        
         <button class="wa-button"
           onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${entry.amount}','${status}')">
           <img src="whatsapp-icon.png" class="wa-icon">
@@ -161,4 +161,5 @@ Thank you!`;
   let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 };
+
 

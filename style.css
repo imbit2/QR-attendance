@@ -244,27 +244,41 @@ textarea:focus {
   color: white !important;
   border-color: #1677ff;
 }
-.wa-btn {
+/* Make Save Button Square */
+.save-btn {
   width: 32px;
   height: 32px;
-  padding: 4px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background-color: #25D366;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: 0.2s ease;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
 }
 
-.wa-btn:hover {
-  background-color: #1ebe5d;
-  transform: scale(1.05);
+/* Fix WhatsApp + Status Alignment */
+.status-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wa-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .wa-icon {
-  width: 20px;
-  height: 20px;
+  width: 26px;
+  height: 26px;
 }

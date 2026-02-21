@@ -119,7 +119,7 @@ async function loadPaymentPage() {
 
         <button 
           onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${entry.amount || ""}','${status}')"
-          style="margin-left:8px; background:#25D366; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;"
+          style="background:#25D366; color:white; border:none; padding:4px 6px; border-radius:4px; cursor:pointer;"
         >📩</button>
       </td>
     `;
@@ -176,3 +176,4 @@ Thank you!`;
   let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 };
+

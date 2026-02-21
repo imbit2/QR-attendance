@@ -112,16 +112,18 @@ async function loadPaymentPage() {
       </td>
 
       <!-- STATUS + WHATSAPP COLUMN (4th) -->
-      <td>
-        <span class="status-box ${status === "Paid" ? "paid-box" : "due-box"}">
-          ${status}
-        </span>
+     <td>
+  <span class="status-box ${status === "Paid" ? "paid-box" : "due-box"}">
+    ${status}
+  </span>
 
-        <button 
-          onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${entry.amount || ""}','${status}')"
-          style="background:#25D366; color:white; border:none; padding:4px 6px; border-radius:4px; cursor:pointer;"
-        >📩</button>
-      </td>
+  <button 
+    class="wa-btn"
+    onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${entry.amount || ""}','${status}')"
+  >
+    <img src="images/whatsapp-icon.png" class="wa-icon">
+  </button>
+</td>
     `;
     table.appendChild(row);
   });
@@ -176,4 +178,5 @@ Thank you!`;
   let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 };
+
 

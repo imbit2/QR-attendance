@@ -27,11 +27,11 @@ async function getFees(year, studentId) {
 }
 
 /* ============================================================
-   SAVE UPDATED FEES
+   SAVE UPDATED FEE STATUS OR AMOUNT
 ============================================================ */
-async function saveFeeStatus(year, studentId, month, value) {
+async function saveFeeField(year, studentId, month, field, value) {
   const ref = doc(db, "fees", year.toString(), "students", studentId);
-  await setDoc(ref, { [month]: value }, { merge: true });
+  await setDoc(ref, { [month]: { [field]: value } }, { merge: true });
 }
 
 /* ============================================================
@@ -51,25 +51,22 @@ async function loadPaymentPage() {
   const year = new Date().getFullYear().toString();
   let fees = await getFees(year, studentId);
 
-  // Auto-create missing fee record
+  // Auto-create missing record
   if (!fees) {
     fees = {};
-    months.forEach(m => (fees[m] = "Due"));
+    months.forEach(m => (fees[m] = { status: "Due", amount: "" }));
     await setDoc(doc(db, "fees", year, "students", studentId), fees);
   }
 
-  document.getElementById("studentID").textContent =
-    `Student ID: ${student.id}`;
-  document.getElementById("studentTitle").textContent =
-    `Fee Payment for: ${student.name}`;
-  document.getElementById("yearTitle").textContent =
-    `Year: ${year}`;
+  document.getElementById("studentID").textContent = `Student ID: ${student.id}`;
+  document.getElementById("studentTitle").textContent = `Fee Payment for: ${student.name}`;
+  document.getElementById("yearTitle").textContent = `Year: ${year}`;
 
   const table = document.getElementById("paymentTable");
   table.innerHTML = "";
 
   months.forEach(month => {
-    const status = fees[month] || "Due";
+    const entry = fees[month] || { status: "Due", amount: "" };
 
     let row = document.createElement("tr");
     row.innerHTML = `
@@ -83,9 +80,25 @@ async function loadPaymentPage() {
       </td>
 
       <td>
-        <span class="status-box ${status === "Paid" ? "paid-box" : "due-box"}">
-          ${status}
+        <span class="status-box ${entry.status === "Paid" ? "paid-box" : "due-box"}">
+          ${entry.status}
         </span>
+      </td>
+
+      <td>
+        <div style="display:flex; gap:4px;">
+          <input 
+            type="number" 
+            id="amount-${month}"
+            placeholder="₹"
+            value="${entry.amount || ""}"
+            style="width:70px; padding:3px;"
+          >
+          <button 
+            onclick="saveAmount('${studentId}', '${month}')"
+            style="padding:4px 6px; background:#3498db; color:white; border:none; border-radius:4px; cursor:pointer;"
+          >💾</button>
+        </div>
       </td>
     `;
     table.appendChild(row);
@@ -97,8 +110,24 @@ async function loadPaymentPage() {
 ============================================================ */
 window.setStatus = async function (studentId, month, value) {
   const year = new Date().getFullYear().toString();
+  await saveFeeField(year, studentId, month, "status", value);
+  loadPaymentPage();
+};
 
-  await saveFeeStatus(year, studentId, month, value);
+/* ============================================================
+   SAVE AMOUNT
+============================================================ */
+window.saveAmount = async function(studentId, month) {
+  const year = new Date().getFullYear().toString();
+  const input = document.getElementById(`amount-${month}`);
+  const amount = input.value.trim();
 
-  loadPaymentPage(); // Refresh
+  if (amount === "") {
+    alert("Please enter an amount.");
+    return;
+  }
+
+  await saveFeeField(year, studentId, month, "amount", Number(amount));
+
+  alert("Amount saved!");
 };

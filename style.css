@@ -244,66 +244,92 @@ textarea:focus {
   color: white !important;
   border-color: #1677ff;
 }
-.amount-wrapper {
+table td {
+  vertical-align: middle;
+  padding: 12px;
+}
+
+/* MONTH COLUMN */
+.cell-month {
+  width: 80px;
+  font-weight: 600;
+}
+
+/* AMOUNT COLUMN */
+.amount-box {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.amount-input {
+.amount-box input {
   width: 80px;
   padding: 6px;
-  height: 32px;
   border-radius: 6px;
   border: 1px solid #ccc;
+  height: 32px;
 }
 
 .save-btn {
-  background: #2d8cf0;
+  background: #1e90ff;
   border: none;
-  padding: 6px 10px;
+  color: white;
   height: 32px;
+  padding: 0 10px;
   border-radius: 6px;
   cursor: pointer;
-  color: white;
-  font-size: 16px;
 }
 
-.mark-buttons button {
+/* MARK (✔ / ✖) */
+.cell-mark {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-green {
+  background: #2ecc71;
+  border: none;
+  color: white;
+  font-size: 18px;
   width: 40px;
   height: 32px;
   border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  color: #fff;
 }
 
-.tick { background: #2ecc71; }
-.cross { background: #e74c3c; }
+.btn-red {
+  background: #e74c3c;
+  border: none;
+  color: white;
+  font-size: 18px;
+  width: 40px;
+  height: 32px;
+  border-radius: 6px;
+}
 
-.status-cell {
+/* STATUS COLUMN */
+.cell-status {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  align-items: flex-start;
 }
 
-.status-box {
+.status-tag {
   padding: 6px 12px;
   border-radius: 6px;
   color: white;
   font-weight: 600;
-  font-size: 14px;
+  width: fit-content;
 }
 
-.paid-box { background: #2ecc71; }
-.due-box { background: #e74c3c; }
+.paid { background: #27ae60; }
+.due { background: #e74c3c; }
 
-.wa-btn {
-  background: #e5f3ff;
+/* WHATSAPP BUTTON */
+.wa-button {
+  background: #eef7ff;
   border: none;
-  border-radius: 6px;
   padding: 6px;
+  border-radius: 6px;
   cursor: pointer;
 }
 

@@ -77,56 +77,64 @@ async function loadPaymentPage() {
   table.innerHTML = "";
 
   months.forEach(month => {
-    const entry = fees[month] || { status: "Due", amount: "" };
+  const entry = fees[month] || { status: "Due", amount: "" };
+  const status = entry.status || "Due";
 
-    // Ensure default status = DUE always
-    const status = entry.status || "Due";
+  let row = document.createElement("tr");
 
-    let row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${month}</td>
+  // Create Amount Input
+  const amountInput = document.createElement("input");
+  amountInput.type = "number";
+  amountInput.id = `amount-${month}`;
+  amountInput.placeholder = "₹";
+  amountInput.value = entry.amount || "";
+  amountInput.style.width = "70px";
 
-      <!-- AMOUNT COLUMN (2nd) -->
-      <td>
-        <div style="display:flex; gap:4px;">
-          <input 
-            type="number" 
-            id="amount-${month}"
-            placeholder="₹"
-            value="${entry.amount || ""}"
-            style="width:70px; padding:3px;"
-          >
-          <button 
-            onclick="saveAmount('${studentId}', '${month}')"
-            class="save-btn"
-          >💾</button>
-        </div>
-      </td>
+  // ADD REQUIRED CLASS 👇👇👇
+  amountInput.classList.add("amount-input");
 
-      <!-- MARK BUTTONS COLUMN (3rd) -->
-      <td>
-        <div class="mark-buttons">
-          <button class="tick" onclick="setStatus('${studentId}','${month}','Paid')">✔</button>
-          <button class="cross" onclick="setStatus('${studentId}','${month}','Due')">✖</button>
-        </div>
-      </td>
+  // Build row
+  row.innerHTML = `
+    <td>${month}</td>
 
-      <!-- STATUS + WHATSAPP COLUMN (4th) -->
-     <td class="status-cell">
-  <span class="status-box ${status === "Paid" ? "paid-box" : "due-box"}">
-    ${status}
-  </span>
+    <td>
+      <div style="display:flex; gap:4px;">
+        <!-- Input will be inserted here -->
+        <span id="input-holder-${month}"></span>
 
-  <button 
-    class="wa-btn"
-    onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${entry.amount || ""}','${status}')"
-  >
-    <img src="whatsapp-icon.png" class="wa-icon">
-  </button>
-</td>
-    `;
-    table.appendChild(row);
-  });
+        <button 
+          onclick="saveAmount('${studentId}', '${month}')"
+          class="save-btn"
+        >💾</button>
+      </div>
+    </td>
+
+    <td>
+      <div class="mark-buttons">
+        <button class="tick" onclick="setStatus('${studentId}','${month}','Paid')">✔</button>
+        <button class="cross" onclick="setStatus('${studentId}','${month}','Due')">✖</button>
+      </div>
+    </td>
+
+    <td class="status-cell">
+      <span class="status-box ${status === "Paid" ? "paid-box" : "due-box"}">
+        ${status}
+      </span>
+
+      <button 
+        class="wa-btn"
+        onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${entry.amount || ""}','${status}')"
+      >
+        <img src="whatsapp-icon.png" class="wa-icon">
+      </button>
+    </td>
+  `;
+
+  table.appendChild(row);
+
+  // Insert the input into placeholder
+  document.getElementById(`input-holder-${month}`).appendChild(amountInput);
+});
 }
 
 /* ============================================================
@@ -178,6 +186,7 @@ Thank you!`;
   let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 };
+
 
 
 

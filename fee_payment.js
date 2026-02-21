@@ -31,7 +31,18 @@ async function getFees(year, studentId) {
 ============================================================ */
 async function saveFeeField(year, studentId, month, field, value) {
   const ref = doc(db, "fees", year.toString(), "students", studentId);
-  await setDoc(ref, { [month]: { [field]: value } }, { merge: true });
+
+  // Ensure full object merge
+  await setDoc(
+    ref,
+    {
+      [month]: {
+        status: field === "status" ? value : undefined,
+        amount: field === "amount" ? value : undefined
+      }
+    },
+    { merge: true }
+  );
 }
 
 /* ============================================================
@@ -51,7 +62,7 @@ async function loadPaymentPage() {
   const year = new Date().getFullYear().toString();
   let fees = await getFees(year, studentId);
 
-  // Auto create missing record
+  // Auto-create missing record
   if (!fees) {
     fees = {};
     months.forEach(m => (fees[m] = { status: "Due", amount: "" }));
@@ -67,6 +78,9 @@ async function loadPaymentPage() {
 
   months.forEach(month => {
     const entry = fees[month] || { status: "Due", amount: "" };
+
+    // Ensure default status = DUE always
+    const status = entry.status || "Due";
 
     let row = document.createElement("tr");
     row.innerHTML = `
@@ -97,11 +111,16 @@ async function loadPaymentPage() {
         </div>
       </td>
 
-      <!-- STATUS COLUMN (4th) -->
+      <!-- STATUS + WHATSAPP COLUMN (4th) -->
       <td>
-        <span class="status-box ${entry.status === "Paid" ? "paid-box" : "due-box"}">
-          ${entry.status}
+        <span class="status-box ${status === "Paid" ? "paid-box" : "due-box"}">
+          ${status}
         </span>
+
+        <button 
+          onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${entry.amount || ""}','${status}')"
+          style="margin-left:8px; background:#25D366; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;"
+        >📩</button>
       </td>
     `;
     table.appendChild(row);
@@ -133,4 +152,27 @@ window.saveAmount = async function(studentId, month) {
   await saveFeeField(year, studentId, month, "amount", Number(amount));
 
   alert("Amount saved!");
+};
+
+/* ============================================================
+   SEND WHATSAPP MESSAGE
+============================================================ */
+window.sendWhatsApp = function(phone, name, month, amount, status) {
+  if (!phone) {
+    alert("Student phone number missing!");
+    return;
+  }
+
+  let msg =
+`Hello ${name},
+Here is your fee update:
+
+Month: ${month}
+Amount: ₹${amount || "Not Entered"}
+Status: ${status}
+
+Thank you!`;
+
+  let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank");
 };

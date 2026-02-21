@@ -78,49 +78,43 @@ async function loadPaymentPage() {
   
   months.forEach(month => {
   const entry = fees[month] || { status: "Due", amount: "" };
-  const status = entry.status || "Due";
+  const status = entry.status;
 
-  let row = document.createElement("tr");
+  const row = document.createElement("tr");
 
   row.innerHTML = `
-    <!-- Month -->
-    <td>${month}</td>
+    <td class="cell-month">${month}</td>
 
-    <!-- Amount Column -->
-    <td>
-      <div class="amount-wrapper">
+    <td class="cell-amount">
+      <div class="amount-box">
         <input 
           type="number"
           id="amount-${month}"
           value="${entry.amount || ""}"
           placeholder="₹"
-          class="amount-input"
         >
-        <button class="save-btn" onclick="saveAmount('${studentId}','${month}')">
+
+        <button onclick="saveAmount('${studentId}','${month}')" class="save-btn">
           💾
         </button>
       </div>
     </td>
 
-    <!-- Mark Buttons -->
-    <td>
-      <div class="mark-buttons">
-        <button class="tick" onclick="setStatus('${studentId}','${month}','Paid')">✔</button>
-        <button class="cross" onclick="setStatus('${studentId}','${month}','Due')">✖</button>
-      </div>
+    <td class="cell-mark">
+      <button class="btn-green" onclick="setStatus('${studentId}','${month}','Paid')">✔</button>
+      <button class="btn-red" onclick="setStatus('${studentId}','${month}','Due')">✖</button>
     </td>
 
-    <!-- Status & WhatsApp -->
-    <td class="status-cell">
-      <span class="status-box ${status === "Paid" ? "paid-box" : "due-box"}">${status}</span>
-      <button class="wa-btn"
-        onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${entry.amount || ""}','${status}')">
+    <td class="cell-status">
+      <span class="status-tag ${status === "Paid" ? "paid" : "due"}">${status}</span>
+
+      <button class="wa-button"
+        onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${entry.amount}','${status}')">
         <img src="whatsapp-icon.png" class="wa-icon">
       </button>
     </td>
   `;
 
-  // Append row
   table.appendChild(row);
 });
 }
@@ -174,6 +168,7 @@ Thank you!`;
   let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 };
+
 
 
 

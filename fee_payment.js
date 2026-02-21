@@ -15,7 +15,7 @@ const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov
 async function getStudents() {
   const snap = await getDocs(collection(db, "students"));
   return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-}
+} 
 
 /* ============================================================
    FETCH FEES FOR YEAR
@@ -178,5 +178,6 @@ Thank you!`;
   let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 };
+
 
 

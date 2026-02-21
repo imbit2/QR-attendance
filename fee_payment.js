@@ -74,8 +74,11 @@ async function loadPaymentPage() {
   table.innerHTML = "";
 
   months.forEach(month => {
-    const entry = fees[month] || { status: "Due", amount: "" };
-    const status = entry.status;
+
+    // 🔥 IMPORTANT FIX — always enforce default "Due"
+    const entry = fees[month] || {};
+    const status = entry.status ? entry.status : "Due";
+    const amount = entry.amount ? entry.amount : "";
 
     const row = document.createElement("tr");
 
@@ -87,7 +90,7 @@ async function loadPaymentPage() {
           <input 
             type="number"
             id="amount-${month}"
-            value="${entry.amount || ""}"
+            value="${amount}"
             placeholder="₹"
           >
           <button onclick="saveAmount('${studentId}','${month}')" class="save-btn">💾</button>
@@ -100,10 +103,12 @@ async function loadPaymentPage() {
       </td>
 
       <td>
-        <span class="status-tag ${status === "Paid" ? "paid" : "due"}">${status}</span>
-        
+        <span class="status-tag ${status === "Paid" ? "paid" : "due"}">
+          ${status}
+        </span>
+
         <button class="wa-button"
-          onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${entry.amount}','${status}')">
+          onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${amount}','${status}')">
           <img src="whatsapp-icon.png" class="wa-icon">
         </button>
       </td>
@@ -161,5 +166,3 @@ Thank you!`;
   let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 };
-
-

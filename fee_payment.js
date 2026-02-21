@@ -34,8 +34,8 @@ async function saveFeeField(year, studentId, month, field, value) {
 
   const toUpdate = {
     [month]: {
-      status: field === "status" ? value : undefined,
-      amount: field === "amount" ? value : undefined
+      ...(field === "status" ? { status: value } : {}),
+      ...(field === "amount" ? { amount: value } : {})
     }
   };
 
@@ -62,7 +62,10 @@ async function loadPaymentPage() {
   // Auto-create record if missing
   if (!fees) {
     fees = {};
-    months.forEach(m => (fees[m] = { status: "Due", amount: "" }));
+    months.forEach(m => {
+      fees[m] = { status: "Due", amount: "" };
+    });
+
     await setDoc(doc(db, "fees", year, "students", studentId), fees);
   }
 
@@ -74,11 +77,11 @@ async function loadPaymentPage() {
   table.innerHTML = "";
 
   months.forEach(month => {
-
-    // 🔥 IMPORTANT FIX — always enforce default "Due"
+    
+    // 🟢 ALWAYS ENFORCE DEFAULT "Due"
     const entry = fees[month] || {};
-    const status = entry.status ? entry.status : "Due";
-    const amount = entry.amount ? entry.amount : "";
+    const status = entry.status ?? "Due";   // <-- FIX
+    const amount = entry.amount ?? "";      // <-- FIX
 
     const row = document.createElement("tr");
 
@@ -98,22 +101,22 @@ async function loadPaymentPage() {
       </td>
 
       <td>
-      <div class="cell-mark">
-        <button class="btn-green" onclick="setStatus('${studentId}','${month}','Paid')">✔</button>
-        <button class="btn-red" onclick="setStatus('${studentId}','${month}','Due')">✖</button>
+        <div class="cell-mark">
+          <button class="btn-green" onclick="setStatus('${studentId}','${month}','Paid')">✔</button>
+          <button class="btn-red" onclick="setStatus('${studentId}','${month}','Due')">✖</button>
         </div>
       </td>
 
       <td>
-      <div class="cell-mark">
-        <span class="status-tag ${status === "Paid" ? "paid" : "due"}">
-          ${status}
-        </span>
+        <div class="cell-mark">
+          <span class="status-tag ${status === "Paid" ? "paid" : "due"}">
+            ${status}
+          </span>
 
-        <button class="wa-button"
-          onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${amount}','${status}')">
-          <img src="whatsapp-icon.png" class="wa-icon">
-        </button>
+          <button class="wa-button"
+            onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${amount}','${status}')">
+            <img src="whatsapp-icon.png" class="wa-icon">
+          </button>
         </div>
       </td>
     `;
@@ -170,7 +173,3 @@ Thank you!`;
   let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 };
-
-
-
-

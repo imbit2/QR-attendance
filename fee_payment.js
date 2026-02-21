@@ -98,7 +98,7 @@ async function loadPaymentPage() {
           >
           <button 
             onclick="saveAmount('${studentId}', '${month}')"
-            style="padding:4px 4px; background:#3498db; color:white; border:none; border-radius:4px; cursor:pointer;"
+            class="save-btn"
           >💾</button>
         </div>
       </td>
@@ -112,7 +112,7 @@ async function loadPaymentPage() {
       </td>
 
       <!-- STATUS + WHATSAPP COLUMN (4th) -->
-     <td>
+     <td class="status-cell">
   <span class="status-box ${status === "Paid" ? "paid-box" : "due-box"}">
     ${status}
   </span>
@@ -121,7 +121,7 @@ async function loadPaymentPage() {
     class="wa-btn"
     onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${entry.amount || ""}','${status}')"
   >
-    <img src="images/whatsapp-icon.png" class="wa-icon">
+    <img src="whatsapp-icon.png" class="wa-icon">
   </button>
 </td>
     `;
@@ -178,6 +178,7 @@ Thank you!`;
   let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 };
+
 
 
 

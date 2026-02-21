@@ -97,7 +97,7 @@ async function loadPaymentPage() {
         </div>
       </td>
 
-      <td class="cell-mark">
+      <td>
         <button class="btn-green" onclick="setStatus('${studentId}','${month}','Paid')">✔</button>
         <button class="btn-red" onclick="setStatus('${studentId}','${month}','Due')">✖</button>
       </td>
@@ -166,3 +166,4 @@ Thank you!`;
   let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 };
+

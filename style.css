@@ -1,12 +1,15 @@
+/* =============================
+   Base Page
+============================= */
 body {  
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   background: #f2f5f9;
   color: #333;
-} 
+}
 
 .container {
-    max-width: 480px;
+  max-width: 480px;
   margin: auto;
   padding: 16px;
 }
@@ -19,23 +22,29 @@ h1, h2, h3 {
   color: #2c3e50;
 }
 
+/* =============================
+   Buttons
+============================= */
 button {
-    width: 100%;
-    background-color: #4da3e6;
-    border: none;
-    padding: 15px;
-    font-size: 18px;
-    color: white;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    cursor: pointer;
-    transition: 0.2s;
+  width: 100%;
+  background-color: #4da3e6;
+  border: none;
+  padding: 15px;
+  font-size: 18px;
+  color: white;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
 button:hover {
-    background-color: #368fd1;
+  background-color: #368fd1;
 }
 
+/* =============================
+   Form Elements
+============================= */
 .input-label,
 label {
   display: block;
@@ -44,10 +53,7 @@ label {
   color: #2c3e50;
 }
 
-.input-field,
-input,
-select,
-textarea {
+input, select, textarea {
   width: 100%;
   padding: 14px;
   font-size: 16px;
@@ -56,7 +62,6 @@ textarea {
   margin-bottom: 12px;
   background: #fff;
   box-sizing: border-box;
-  display: block;
 }
 
 input:focus,
@@ -65,226 +70,57 @@ textarea:focus {
   outline: none;
   border-color: #3498db;
 }
-.qr-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(22mm, 1fr));
-  gap: 6mm;
-  justify-items: center;
-  margin-top: 20px;
-}
-/* ===== Search Row ===== */
-.search-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
-  width: 100%;
-}
 
-/* Search input */
-.search-row input {
-  flex: 1;
-  padding: 14px;
-  font-size: 16px;
-  border-radius: 14px;
-  border: 1px solid #ddd;
-  min-width: 0; /* VERY IMPORTANT for mobile */
-}
+/* =============================
+   TABLE (FEE PAYMENT)
+============================= */
 
-/* Icon buttons */
-.icon-btn {
-  max-width: 50px;
-  height: 50px;
-  background: #3498db;
-  color: #fff;
-  border-radius: 14px;
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-    #summaryTable {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-
-    #summaryTable th, #summaryTable td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: left;
-      font-size: 14px;
-    }
-
-    #summaryTable th {
-      background: #3498db;
-      color: white;
-    }
-
-    #summaryTable tr:nth-child(even) {
-      background: #f4f6f8;
-    }
-
-    .controls {
-      margin: 10px 0;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .card,
-.box,
-.section {
-  background: #fff;
-  border-radius: 16px;
-  padding: 14px;
-  margin-bottom: 14px;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-}
-@media print {
-  body {
-    background: #fff;
-  }
-
-  .container {
-    max-width: none;
-    padding: 0;
-  }
-}
-@media (max-width: 360px) {
-  .container {
-    padding: 12px;
-  }
-  .primary-btn,
-  button {
-    font-size: 16px;
-    padding: 14px;
-  }
-}
-.radio-group {
-  display: flex;
-  flex-direction: row;
-  gap: 20px;
-  margin-bottom: 15px;
-}
-
-.radio-label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 16px;
-}
-/* Present = Green */
-.status-green {
-  color: green;
-  font-weight: bold;
-}
-
-/* Absent = Red */
-.status-red {
-  color: red;
-  font-weight: bold;
-}
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  gap: 6px;
-}
-
-.pagination button {
-  padding: 6px 12px;
-  border: 1px solid #d0d7de;
-  background: white;
-  cursor: pointer;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-.pagination button:hover {
-  background: #f0f0f0;
-}
-
-.pagination .active-page {
-  background: #0d6efd;
-  color: white;
-  border-color: #0d6efd;
-}
-
-.pagination .disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-#paginationContainer {
-  display: flex;
-  gap: 8px;
-  margin-top: 20px;
-}
-
-#paginationContainer button {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  border: 1px solid #d0d7e2;
-  background: #f8fbff;
-  font-size: 16px;
-  cursor: pointer;
-  color: #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#paginationContainer button:hover {
-  background: #e7efff;
-}
-
-#paginationContainer button.active-page {
-  background: #1677ff;
-  color: white !important;
-  border-color: #1677ff;
-}
-/* TABLE BASE */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  margin-top: 18px;
 }
 
 th, td {
   padding: 12px;
-  text-align: left;
   vertical-align: middle;
+  font-size: 14px;
 }
 
 th {
   background: #2196f3;
   color: white;
   font-weight: 600;
+  text-align: center;
 }
 
-/* ROW BORDER */
 tr {
   border-bottom: 1px solid #ddd;
 }
 
-/* MONTH */
-.cell-month {
-  font-weight: 600;
-  width: 80px;
+tr:nth-child(even) {
+  background: #f4f6f8;
 }
 
-/* AMOUNT BOX */
+/* Month column */
+.cell-month {
+  font-weight: 600;
+  width: 70px;
+}
+
+/* =============================
+   AMOUNT CELL
+============================= */
 .amount-box {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .amount-box input {
-  width: 90px;
+  width: 80px;
   height: 34px;
-  padding: 4px 8px;
+  padding: 4px 6px;
   border-radius: 6px;
   border: 1px solid #bbb;
   font-size: 14px;
@@ -294,17 +130,23 @@ tr {
   background: #1e88e5;
   color: white;
   border: none;
-  width: 38px;
+  width: 36px;
   height: 34px;
   border-radius: 6px;
   font-size: 18px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* MARK BUTTONS */
+/* =============================
+   MARK BUTTONS
+============================= */
 .cell-mark {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  justify-content: center;
 }
 
 .btn-green,
@@ -319,13 +161,16 @@ tr {
 }
 
 .btn-green { background: #27ae60; }
-.btn-red { background: #e74c3c; }
+.btn-red   { background: #e74c3c; }
 
-/* STATUS COLUMN */
+/* =============================
+   STATUS COLUMN
+============================= */
 .cell-status {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  align-items: center; /* FIXED ALIGNMENT */
 }
 
 .status-tag {
@@ -334,21 +179,36 @@ tr {
   padding: 6px 14px;
   border-radius: 6px;
   width: fit-content;
+  text-align: center;
 }
 
 .paid { background: #2ecc71; }
-.due { background: #e74c3c; }
+.due  { background: #e74c3c; }
 
-/* WHATSAPP BUTTON */
+/* =============================
+   WHATSAPP BUTTON
+============================= */
 .wa-button {
   background: #eef6ff;
   border: none;
   padding: 6px;
   border-radius: 6px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .wa-icon {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
+}
+
+/* =============================
+   Responsive tweaks
+============================= */
+@media (max-width: 360px) {
+  .container { padding: 12px; }
+  button { font-size: 16px; padding: 14px; }
+  .amount-box input { width: 70px; }
 }

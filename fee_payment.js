@@ -59,7 +59,7 @@ async function loadPaymentPage() {
   const year = new Date().getFullYear().toString();
   let fees = await getFees(year, studentId);
 
-  // Auto-create full record if missing
+  // Auto-create record if missing
   if (!fees) {
     fees = {};
     months.forEach(m => (fees[m] = { status: "Due", amount: "" }));
@@ -78,8 +78,9 @@ async function loadPaymentPage() {
     const status = entry.status;
 
     const row = document.createElement("tr");
+
     row.innerHTML = `
-      <td class="cell-month">${month}</td>
+      <td>${month}</td>
 
       <td>
         <div class="amount-box">
@@ -100,7 +101,8 @@ async function loadPaymentPage() {
 
       <td class="cell-status">
         <span class="status-tag ${status === "Paid" ? "paid" : "due"}">${status}</span>
-        <button class="wa-button" 
+
+        <button class="wa-button"
           onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${entry.amount}','${status}')">
           <img src="whatsapp-icon.png" class="wa-icon">
         </button>

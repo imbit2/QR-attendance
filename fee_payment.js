@@ -15,7 +15,7 @@ const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov
 async function getStudents() {
   const snap = await getDocs(collection(db, "students"));
   return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-} 
+}
 
 /* ============================================================
    FETCH FEES FOR YEAR
@@ -27,22 +27,19 @@ async function getFees(year, studentId) {
 }
 
 /* ============================================================
-   SAVE STATUS OR AMOUNT
+   SAVE STATUS OR AMOUNT (MERGE SAFE)
 ============================================================ */
 async function saveFeeField(year, studentId, month, field, value) {
   const ref = doc(db, "fees", year.toString(), "students", studentId);
 
-  // Ensure full object merge
-  await setDoc(
-    ref,
-    {
-      [month]: {
-        status: field === "status" ? value : undefined,
-        amount: field === "amount" ? value : undefined
-      }
-    },
-    { merge: true }
-  );
+  const toUpdate = {
+    [month]: {
+      status: field === "status" ? value : undefined,
+      amount: field === "amount" ? value : undefined
+    }
+  };
+
+  await setDoc(ref, toUpdate, { merge: true });
 }
 
 /* ============================================================
@@ -62,7 +59,7 @@ async function loadPaymentPage() {
   const year = new Date().getFullYear().toString();
   let fees = await getFees(year, studentId);
 
-  // Auto-create missing record
+  // Auto-create full record if missing
   if (!fees) {
     fees = {};
     months.forEach(m => (fees[m] = { status: "Due", amount: "" }));
@@ -75,48 +72,43 @@ async function loadPaymentPage() {
 
   const table = document.getElementById("paymentTable");
   table.innerHTML = "";
-  
+
   months.forEach(month => {
-  const entry = fees[month] || { status: "Due", amount: "" };
-  const status = entry.status;
+    const entry = fees[month] || { status: "Due", amount: "" };
+    const status = entry.status;
 
-  const row = document.createElement("tr");
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td class="cell-month">${month}</td>
 
-  row.innerHTML = `
-    <td class="cell-month">${month}</td>
+      <td>
+        <div class="amount-box">
+          <input 
+            type="number"
+            id="amount-${month}"
+            value="${entry.amount || ""}"
+            placeholder="₹"
+          >
+          <button onclick="saveAmount('${studentId}','${month}')" class="save-btn">💾</button>
+        </div>
+      </td>
 
-    <td class="cell-amount">
-      <div class="amount-box">
-        <input 
-          type="number"
-          id="amount-${month}"
-          value="${entry.amount || ""}"
-          placeholder="₹"
-        >
+      <td class="cell-mark">
+        <button class="btn-green" onclick="setStatus('${studentId}','${month}','Paid')">✔</button>
+        <button class="btn-red" onclick="setStatus('${studentId}','${month}','Due')">✖</button>
+      </td>
 
-        <button onclick="saveAmount('${studentId}','${month}')" class="save-btn">
-          💾
+      <td class="cell-status">
+        <span class="status-tag ${status === "Paid" ? "paid" : "due"}">${status}</span>
+        <button class="wa-button" 
+          onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${entry.amount}','${status}')">
+          <img src="whatsapp-icon.png" class="wa-icon">
         </button>
-      </div>
-    </td>
+      </td>
+    `;
 
-    <td class="cell-mark">
-      <button class="btn-green" onclick="setStatus('${studentId}','${month}','Paid')">✔</button>
-      <button class="btn-red" onclick="setStatus('${studentId}','${month}','Due')">✖</button>
-    </td>
-
-    <td class="cell-status">
-      <span class="status-tag ${status === "Paid" ? "paid" : "due"}">${status}</span>
-
-      <button class="wa-button"
-        onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${entry.amount}','${status}')">
-        <img src="whatsapp-icon.png" class="wa-icon">
-      </button>
-    </td>
-  `;
-
-  table.appendChild(row);
-});
+    table.appendChild(row);
+  });
 }
 
 /* ============================================================
@@ -125,7 +117,7 @@ async function loadPaymentPage() {
 window.setStatus = async function (studentId, month, value) {
   const year = new Date().getFullYear().toString();
   await saveFeeField(year, studentId, month, "status", value);
-  loadPaymentPage(); // refresh UI
+  loadPaymentPage();
 };
 
 /* ============================================================
@@ -142,7 +134,6 @@ window.saveAmount = async function(studentId, month) {
   }
 
   await saveFeeField(year, studentId, month, "amount", Number(amount));
-
   alert("Amount saved!");
 };
 
@@ -168,11 +159,3 @@ Thank you!`;
   let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 };
-
-
-
-
-
-
-
-

@@ -1,15 +1,8 @@
 import { db } from "./firebase-config.js";
 import {
   collection,
-  getDocs,
-  doc,
-  getDoc
+  getDocs
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-
-const months = [
-  "Jan","Feb","Mar","Apr","May","Jun",
-  "Jul","Aug","Sep","Oct","Nov","Dec"
-];
 
 /* ============================================================
    LOAD STUDENTS
@@ -20,17 +13,11 @@ async function getStudents() {
 }
 
 /* ============================================================
-   GET ATTENDANCE FOR MONTH
+   GET ATTENDANCE FOR SELECTED MONTH
 ============================================================ */
 async function getAttendance(year, month, studentId) {
-  const monthIndex = months.indexOf(month) + 1; // Jan = 1
-  const monthStr = monthIndex.toString().padStart(2, "0");
-
-  const start = `${year}-${monthStr}-01`;
-
-  // end = last day of month
-  const lastDay = new Date(year, monthIndex, 0).getDate();
-  const end = `${year}-${monthStr}-${lastDay}`;
+  // month is already "YYYY-MM"
+  const monthStr = month;   // example: "2026-02"
 
   const snap = await getDocs(collection(db, "attendance"));
 
@@ -39,10 +26,9 @@ async function getAttendance(year, month, studentId) {
   snap.forEach(docSnap => {
     const docId = docSnap.id; // format YYYY-MM-DD
 
-    // Only count dates inside selected month
-    if (docId >= start && docId <= end) {
+    // Check if document is inside the selected month
+    if (docId.startsWith(monthStr)) {
       const data = docSnap.data();
-
       if (data[studentId] && data[studentId].status === "Present") {
         presentCount++;
       }
@@ -53,37 +39,20 @@ async function getAttendance(year, month, studentId) {
 }
 
 /* ============================================================
-   POPULATE MONTH SELECT DROPDOWN
-============================================================ */
-function populateMonthDropdown() {
-  const select = document.getElementById("monthSelect");
-
-  months.forEach((m, i) => {
-    const option = document.createElement("option");
-    option.value = m;
-    option.textContent = m;
-
-    // auto-select current month
-    if (i === new Date().getMonth()) option.selected = true;
-
-    select.appendChild(option);
-  });
-}
-
-/* ============================================================
    LOAD SUMMARY TABLE
 ============================================================ */
 async function loadSummary() {
   const tbody = document.getElementById("summaryBody");
   tbody.innerHTML = "";
 
-  const year = new Date().getFullYear().toString();
-  const selectedMonth = document.getElementById("monthSelect").value;
+  const monthInput = document.getElementById("monthSelect").value;
+  if (!monthInput) return; // No month selected yet
 
+  const [year, month] = monthInput.split("-");
   const students = await getStudents();
 
   for (let student of students) {
-    const days = await getAttendance(year, selectedMonth, student.id);
+    const days = await getAttendance(year, `${year}-${month}`, student.id);
 
     const row = document.createElement("tr");
     row.innerHTML = `
@@ -120,16 +89,18 @@ function exportReport() {
 /* ============================================================
    INITIALIZE PAGE
 ============================================================ */
-document.addEventListener("DOMContentLoaded", async () => {
-  populateMonthDropdown();
-  await loadSummary();
-});
+document.addEventListener("DOMContentLoaded", () => {
+  // Auto-select current month in input[type=month]
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, "0");
+  document.getElementById("monthSelect").value = `${year}-${month}`;
 
-/* Change month listener */
-document.getElementById("monthSelect").addEventListener("change", () => {
   loadSummary();
 });
 
-/* Export CSV */
+/* Change month listener */
+document.getElementById("monthSelect").addEventListener("change", loadSummary);
 
+/* Export CSV */
 document.getElementById("exportBtn").addEventListener("click", exportReport);

@@ -23,9 +23,33 @@ async function getStudents() {
    GET ATTENDANCE FOR MONTH
 ============================================================ */
 async function getAttendance(year, month, studentId) {
-  const ref = doc(db, "attendance", year.toString(), month, studentId);
-  const snap = await getDoc(ref);
-  return snap.exists() ? snap.data().days : 0;
+  const monthIndex = months.indexOf(month) + 1; // Jan = 1
+  const monthStr = monthIndex.toString().padStart(2, "0");
+
+  const start = `${year}-${monthStr}-01`;
+
+  // end = last day of month
+  const lastDay = new Date(year, monthIndex, 0).getDate();
+  const end = `${year}-${monthStr}-${lastDay}`;
+
+  const snap = await getDocs(collection(db, "attendance"));
+
+  let presentCount = 0;
+
+  snap.forEach(docSnap => {
+    const docId = docSnap.id; // format YYYY-MM-DD
+
+    // Only count dates inside selected month
+    if (docId >= start && docId <= end) {
+      const data = docSnap.data();
+
+      if (data[studentId] && data[studentId].status === "Present") {
+        presentCount++;
+      }
+    }
+  });
+
+  return presentCount;
 }
 
 /* ============================================================
@@ -107,4 +131,5 @@ document.getElementById("monthSelect").addEventListener("change", () => {
 });
 
 /* Export CSV */
+
 document.getElementById("exportBtn").addEventListener("click", exportReport);

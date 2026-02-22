@@ -10,9 +10,12 @@ import {
 const rowsPerPage = 10;
 let allStudents = [];
 let currentPage = 1;
+
 let selectedYear = "";
 let selectedMonthStr = "";
+
 let monthInputValue = "";
+let monthlyAttendanceCache = {}; // ✅ cache attendance only once
 
 /* ============================================================
    LOAD STUDENTS
@@ -23,42 +26,59 @@ async function getStudents() {
 }
 
 /* ============================================================
-   GET ATTENDANCE FOR SELECTED MONTH
+   LOAD ATTENDANCE ONLY ONCE FOR SELECTED MONTH
 ============================================================ */
-async function getAttendance(year, monthStr, studentId) {
-  const attendanceSnap = await getDocs(collection(db, "attendance"));
+async function loadAttendanceForMonth(monthStr) {
+  const snap = await getDocs(collection(db, "attendance"));
+  
+  monthlyAttendanceCache = {}; // clear old cache
+  const dailyRecords = snap.docs;
 
-  let presentCount = 0;
-
-  attendanceSnap.forEach(docSnap => {
+  for (let docSnap of dailyRecords) {
     const docId = docSnap.id; // YYYY-MM-DD
 
     if (docId.startsWith(monthStr)) {
-      const data = docSnap.data();
-      if (data[studentId] && data[studentId].status === "Present") {
-        presentCount++;
-      }
-    }
-  });
+      const dayData = docSnap.data();
 
-  return presentCount;
+      // Store for quick lookup
+      monthlyAttendanceCache[docId] = dayData;
+    }
+  }
 }
 
 /* ============================================================
-   LOAD TABLE PAGE DATA
+   FAST ATTENDANCE COUNT USING CACHED DATA
 ============================================================ */
-async function loadPage(pageNumber) {
-  currentPage = pageNumber;
+function getAttendance(studentId) {
+  let present = 0;
+
+  for (let day in monthlyAttendanceCache) {
+    const rec = monthlyAttendanceCache[day];
+
+    if (rec[studentId] && rec[studentId].status === "Present") {
+      present++;
+    }
+  }
+
+  return present;
+}
+
+/* ============================================================
+   LOAD PAGE
+============================================================ */
+async function loadPage(pageNum) {
+  currentPage = pageNum;
 
   const tbody = document.getElementById("summaryBody");
   tbody.innerHTML = "";
 
-  const startIndex = (pageNumber - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const pageStudents = allStudents.slice(startIndex, endIndex);
+  const start = (pageNum - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+
+  const pageStudents = allStudents.slice(start, end);
 
   for (let student of pageStudents) {
-    const days = await getAttendance(selectedYear, selectedMonthStr, student.id);
+    const days = getAttendance(student.id);
 
     const row = document.createElement("tr");
     row.innerHTML = `
@@ -73,60 +93,48 @@ async function loadPage(pageNumber) {
 }
 
 /* ============================================================
-   ADVANCED PAGINATION (MATCHES YOUR PROVIDED FUNCTION)
+   ADVANCED PAGINATION
 ============================================================ */
 function renderPagination() {
   const container = document.getElementById("paginationContainer");
   container.innerHTML = "";
 
-  const filteredStudents = allStudents;
-  const totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
+  const totalPages = Math.ceil(allStudents.length / rowsPerPage);
   if (totalPages <= 1) return;
 
-  /* ---- PREVIOUS BUTTON ---- */
-  let prevBtn = document.createElement("button");
-  prevBtn.textContent = "<<";
-  prevBtn.className = currentPage === 1 ? "disabled" : "";
-  prevBtn.onclick = () => {
-    if (currentPage > 1) loadPage(currentPage - 1);
-  };
-  container.appendChild(prevBtn);
+  function addButton(text, disabled, click) {
+    let btn = document.createElement("button");
+    btn.textContent = text;
+    if (disabled) btn.classList.add("disabled");
+    btn.onclick = click;
+    container.appendChild(btn);
+  }
 
-  /* ---- PAGE RANGE LOGIC ---- */
-  let maxPagesToShow = 5;
+  addButton("<<", currentPage === 1, () => loadPage(currentPage - 1));
+
+  let maxPages = 5;
   let startPage = Math.max(1, currentPage - 2);
-  let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+  let endPage = Math.min(totalPages, startPage + maxPages - 1);
 
   if (endPage - startPage < 4) {
     startPage = Math.max(1, endPage - 4);
   }
 
-  /* ---- FIRST PAGE + "..." ---- */
   if (startPage > 1) {
-    addPageButton(1);
+    addPage(1);
     if (startPage > 2) addEllipsis();
   }
 
-  /* ---- MIDDLE PAGES ---- */
-  for (let i = startPage; i <= endPage; i++) addPageButton(i);
+  for (let i = startPage; i <= endPage; i++) addPage(i);
 
-  /* ---- LAST PAGE + "..." ---- */
   if (endPage < totalPages) {
     if (endPage < totalPages - 1) addEllipsis();
-    addPageButton(totalPages);
+    addPage(totalPages);
   }
 
-  /* ---- NEXT BUTTON ---- */
-  let nextBtn = document.createElement("button");
-  nextBtn.textContent = ">>";
-  nextBtn.className = currentPage === totalPages ? "disabled" : "";
-  nextBtn.onclick = () => {
-    if (currentPage < totalPages) loadPage(currentPage + 1);
-  };
-  container.appendChild(nextBtn);
+  addButton(">>", currentPage === totalPages, () => loadPage(currentPage + 1));
 
-  /* Utility functions */
-  function addPageButton(i) {
+  function addPage(i) {
     let btn = document.createElement("button");
     btn.textContent = i;
     btn.className = (i === currentPage) ? "active-page" : "";
@@ -135,16 +143,15 @@ function renderPagination() {
   }
 
   function addEllipsis() {
-    let span = document.createElement("button");
-    span.textContent = "...";
-    span.className = "disabled";
-    span.style.cursor = "default";
-    container.appendChild(span);
+    let el = document.createElement("button");
+    el.textContent = "...";
+    el.className = "disabled";
+    container.appendChild(el);
   }
 }
 
 /* ============================================================
-   LOAD SUMMARY (FETCH STUDENTS + RESET PAGINATION)
+   LOAD SUMMARY
 ============================================================ */
 async function loadSummary() {
   monthInputValue = document.getElementById("monthSelect").value;
@@ -154,18 +161,24 @@ async function loadSummary() {
   selectedYear = year;
   selectedMonthStr = `${year}-${month}`;
 
+  // Load students once
   allStudents = await getStudents();
 
+  // Load attendance ONCE for entire month (FAST)
+  await loadAttendanceForMonth(selectedMonthStr);
+
+  // Load page 1
   loadPage(1);
 }
+
 /* ============================================================
-   EXPORT ENTIRE MONTH DATA TO CSV (ALL STUDENTS)
+   EXPORT CSV (FAST)
 ============================================================ */
 async function exportReport() {
   let rows = [["Student ID", "Name", "Attendance Days"]];
 
   for (let student of allStudents) {
-    const days = await getAttendance(selectedYear, selectedMonthStr, student.id);
+    const days = getAttendance(student.id);
     rows.push([student.id, student.name, days]);
   }
 
@@ -193,4 +206,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.getElementById("monthSelect").addEventListener("change", loadSummary);
 document.getElementById("exportBtn").addEventListener("click", exportReport);
-

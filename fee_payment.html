@@ -10,9 +10,14 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Ro
 
 h1, h2, h3 { text-align: center; margin: 12px 0 18px; font-weight: 700; color: #2c3e50; }
 
-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+  #summaryTable { width: 100%; border-collapse: collapse; margin-top: 15px; }
+#summaryTable th, #summaryTable td { border: 1px solid #ccc; padding: 10px; text-align: left; font-size: 14px; }
+#summaryTable th { background: #3498db; color: white; }
+#summaryTable tr:nth-child(even) { background: #f4f6f8; }
+
+/* table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
 th, td { padding: 12px; text-align: left; vertical-align: middle; border: 1px solid #d0d7e2; }
-th { background: #2196f3; color: white; font-weight: 600; }
+th { background: #2196f3; color: white; font-weight: 600; } */
 
 /* Amount input */
 .amount-box { display: flex; align-items: center; gap: 8px; }
@@ -87,5 +92,6 @@ th { background: #2196f3; color: white; font-weight: 600; }
 
 </body>
 </html>
+
 
 

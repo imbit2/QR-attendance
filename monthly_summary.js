@@ -158,26 +158,23 @@ async function loadSummary() {
 
   loadPage(1);
 }
-
 /* ============================================================
-   EXPORT TO CSV
+   EXPORT ENTIRE MONTH DATA TO CSV (ALL STUDENTS)
 ============================================================ */
-function exportReport() {
+async function exportReport() {
   let rows = [["Student ID", "Name", "Attendance Days"]];
 
-  const trs = document.querySelectorAll("#summaryBody tr");
-
-  trs.forEach(tr => {
-    const cols = [...tr.children].map(td => td.textContent);
-    rows.push(cols);
-  });
+  for (let student of allStudents) {
+    const days = await getAttendance(selectedYear, selectedMonthStr, student.id);
+    rows.push([student.id, student.name, days]);
+  }
 
   const csv = rows.map(e => e.join(",")).join("\n");
   const blob = new Blob([csv], { type: "text/csv" });
 
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "Monthly-Summary.csv";
+  link.download = `Monthly-Summary-${selectedMonthStr}.csv`;
   link.click();
 }
 
@@ -196,3 +193,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.getElementById("monthSelect").addEventListener("change", loadSummary);
 document.getElementById("exportBtn").addEventListener("click", exportReport);
+

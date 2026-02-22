@@ -7,7 +7,7 @@ import {
 /* ============================================================
    GLOBALS
 ============================================================ */
-const ITEMS_PER_PAGE = 10;
+const rowsPerPage = 10;
 let allStudents = [];
 let currentPage = 1;
 let selectedYear = "";
@@ -53,8 +53,8 @@ async function loadPage(pageNumber) {
   const tbody = document.getElementById("summaryBody");
   tbody.innerHTML = "";
 
-  const startIndex = (pageNumber - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const startIndex = (pageNumber - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
   const pageStudents = allStudents.slice(startIndex, endIndex);
 
   for (let student of pageStudents) {
@@ -73,38 +73,74 @@ async function loadPage(pageNumber) {
 }
 
 /* ============================================================
-   RENDER PAGINATION BUTTONS
+   ADVANCED PAGINATION (MATCHES YOUR PROVIDED FUNCTION)
 ============================================================ */
 function renderPagination() {
   const container = document.getElementById("paginationContainer");
   container.innerHTML = "";
 
-  const totalPages = Math.ceil(allStudents.length / ITEMS_PER_PAGE);
+  const filteredStudents = allStudents;
+  const totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
+  if (totalPages <= 1) return;
 
-  if (totalPages <= 1) return; // Nothing to paginate
-
-  // Prev button
-  const prevBtn = document.createElement("button");
-  prevBtn.textContent = "Prev";
-  prevBtn.disabled = currentPage === 1;
-  prevBtn.onclick = () => loadPage(currentPage - 1);
+  /* ---- PREVIOUS BUTTON ---- */
+  let prevBtn = document.createElement("button");
+  prevBtn.textContent = "<<";
+  prevBtn.className = currentPage === 1 ? "disabled" : "";
+  prevBtn.onclick = () => {
+    if (currentPage > 1) loadPage(currentPage - 1);
+  };
   container.appendChild(prevBtn);
 
-  // Page number buttons
-  for (let i = 1; i <= totalPages; i++) {
-    const btn = document.createElement("button");
+  /* ---- PAGE RANGE LOGIC ---- */
+  let maxPagesToShow = 5;
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+  if (endPage - startPage < 4) {
+    startPage = Math.max(1, endPage - 4);
+  }
+
+  /* ---- FIRST PAGE + "..." ---- */
+  if (startPage > 1) {
+    addPageButton(1);
+    if (startPage > 2) addEllipsis();
+  }
+
+  /* ---- MIDDLE PAGES ---- */
+  for (let i = startPage; i <= endPage; i++) addPageButton(i);
+
+  /* ---- LAST PAGE + "..." ---- */
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) addEllipsis();
+    addPageButton(totalPages);
+  }
+
+  /* ---- NEXT BUTTON ---- */
+  let nextBtn = document.createElement("button");
+  nextBtn.textContent = ">>";
+  nextBtn.className = currentPage === totalPages ? "disabled" : "";
+  nextBtn.onclick = () => {
+    if (currentPage < totalPages) loadPage(currentPage + 1);
+  };
+  container.appendChild(nextBtn);
+
+  /* Utility functions */
+  function addPageButton(i) {
+    let btn = document.createElement("button");
     btn.textContent = i;
-    btn.className = (i === currentPage) ? "active" : "";
+    btn.className = (i === currentPage) ? "active-page" : "";
     btn.onclick = () => loadPage(i);
     container.appendChild(btn);
   }
 
-  // Next button
-  const nextBtn = document.createElement("button");
-  nextBtn.textContent = "Next";
-  nextBtn.disabled = currentPage === totalPages;
-  nextBtn.onclick = () => loadPage(currentPage + 1);
-  container.appendChild(nextBtn);
+  function addEllipsis() {
+    let span = document.createElement("button");
+    span.textContent = "...";
+    span.className = "disabled";
+    span.style.cursor = "default";
+    container.appendChild(span);
+  }
 }
 
 /* ============================================================
@@ -118,15 +154,13 @@ async function loadSummary() {
   selectedYear = year;
   selectedMonthStr = `${year}-${month}`;
 
-  // Fetch all students once
   allStudents = await getStudents();
 
-  // Load first page
   loadPage(1);
 }
 
 /* ============================================================
-   EXPORT TABLE TO CSV
+   EXPORT TO CSV
 ============================================================ */
 function exportReport() {
   let rows = [["Student ID", "Name", "Attendance Days"]];
@@ -148,7 +182,7 @@ function exportReport() {
 }
 
 /* ============================================================
-   INITIALIZE PAGE
+   INITIALIZE
 ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
   const now = new Date();
@@ -160,8 +194,5 @@ document.addEventListener("DOMContentLoaded", () => {
   loadSummary();
 });
 
-// Change month listener
 document.getElementById("monthSelect").addEventListener("change", loadSummary);
-
-// Export CSV
 document.getElementById("exportBtn").addEventListener("click", exportReport);

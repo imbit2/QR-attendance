@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Monthly Summary</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h2>Monthly Summary Report</h2>
+
+<div class="container">
+    <label>Select Month:</label>
+    <select id="monthSelect"></select>
+
+    <button id="exportBtn" class="export-btn">Export Report</button>
+</div>
+
+<table class="summary-table">
+    <thead>
+        <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Attendance Days</th>
+        </tr>
+    </thead>
+    <tbody id="summaryBody"></tbody>
+</table>
+
+<script type="module" src="script.js"></script>
+<script type="module" src="monthly-summary.js"></script>
+</body>
+</html>

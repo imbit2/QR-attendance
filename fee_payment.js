@@ -35,13 +35,13 @@ async function saveFeeField(year, studentId, month, field, value) {
   const toUpdate = {
     [month]: {
       ...(field === "status" ? { status: value } : {}),
-      ...(field === "amount" ? { amount: value } : {})
+      ...(field === "amount" ? { amount: value } : {}),
+      ...(field === "waSent" ? { waSent: value } : {})
     }
   };
 
   await setDoc(ref, toUpdate, { merge: true });
 }
-
 /* ============================================================
    LOAD PAYMENT PAGE
 ============================================================ */
@@ -114,9 +114,11 @@ async function loadPaymentPage() {
           </span>
 
           <button class="wa-button"
-            onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${amount}','${status}')">
-            <img src="whatsapp-icon.png" class="wa-icon">
-          </button>
+          id="wa-${month}"
+          ${entry.waSent ? "disabled style='opacity:0.5; cursor:not-allowed;'" : ""}
+          onclick="sendWhatsApp('${student.phone}','${student.name}','${month}','${amount}','${status}')">
+          <img src="whatsapp-icon.png" class="wa-icon">
+            </button>
         </div>
       </td>
     `;
@@ -154,7 +156,7 @@ window.saveAmount = async function(studentId, month) {
 /* ============================================================
    SEND WHATSAPP MESSAGE
 ============================================================ */
-window.sendWhatsApp = function(phone, name, month, amount, status) {
+window.sendWhatsApp = async function(phone, name, month, amount, status) {
   if (!phone) {
     alert("Student phone number missing!");
     return;
@@ -172,4 +174,20 @@ Thank you!`;
 
   let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
+
+  // After user returns → confirm popup
+  setTimeout(async () => {
+    let sent = confirm("Did you send the message?");
+    if (sent) {
+      // Mark as sent in Firestore
+      const year = new Date().getFullYear().toString();
+      await saveFeeField(year, localStorage.getItem("feeSelectedStudent"), month, "waSent", true);
+
+      // Disable the button in UI
+      const btn = document.getElementById(`wa-${month}`);
+      btn.disabled = true;
+      btn.style.opacity = "0.5";
+      btn.style.cursor = "not-allowed";
+    }
+  }, 500);
 };

@@ -156,11 +156,16 @@ window.saveAmount = async function(studentId, month) {
 /* ============================================================
    SEND WHATSAPP MESSAGE
 ============================================================ */
-window.sendWhatsApp = async function(phone, name, month, amount, status) {
+let pendingMonth = null;
+
+window.sendWhatsApp = function(phone, name, month, amount, status) {
+
   if (!phone) {
     alert("Student phone number missing!");
     return;
   }
+
+  pendingMonth = month; // Track which month is waiting for confirmation
 
   let msg =
 `Hello ${name},
@@ -174,20 +179,27 @@ Thank you!`;
 
   let url = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
-
-  // After user returns → confirm popup
-  setTimeout(async () => {
-    let sent = confirm("Did you send the message?");
-    if (sent) {
-      // Mark as sent in Firestore
-      const year = new Date().getFullYear().toString();
-      await saveFeeField(year, localStorage.getItem("feeSelectedStudent"), month, "waSent", true);
-
-      // Disable the button in UI
-      const btn = document.getElementById(`wa-${month}`);
-      btn.disabled = true;
-      btn.style.opacity = "0.5";
-      btn.style.cursor = "not-allowed";
-    }
-  }, 500);
 };
+
+document.addEventListener("visibilitychange", async function () {
+  if (document.visibilityState === "visible" && pendingMonth) {
+
+    let confirmSend = confirm("Did you send the message?");
+    if (confirmSend) {
+
+      const year = new Date().getFullYear().toString();
+      const studentId = localStorage.getItem("feeSelectedStudent");
+
+      await saveFeeField(year, studentId, pendingMonth, "waSent", true);
+
+      const btn = document.getElementById(`wa-${pendingMonth}`);
+      if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = "0.5";
+        btn.style.cursor = "not-allowed";
+      }
+    }
+
+    pendingMonth = null; // Reset
+  }
+});

@@ -101,38 +101,59 @@ export async function exportStudentsToExcel() {
   const snap = await getDocs(collection(db, "students"));
   const students = [];
 
-  snap.forEach(doc => {
-    students.push({ id: doc.id, ...doc.data() });
+  snap.forEach(docSnap => {
+    students.push({ id: docSnap.id, ...docSnap.data() });
   });
 
   if (students.length === 0) {
-    alert("No student data found in database!");
+    alert("No student data found!");
     return;
   }
 
-  // CSV header
-  let csv = "Student ID,Name,Guardian,Date of Birth,Address,Belt,Phone,Gender\n";
+  // ✅ Sort (optional)
+  students.sort((a, b) => a.id.localeCompare(b.id));
 
-  // Add rows
-  students.forEach(s => {
-    csv += `"${s.id || ""}","${s.name || ""}","${s.guardian || ""}","${s.dob || ""}",
-            "${s.address || ""}","${s.belt || ""}","${s.phone || ""}","${s.gender || ""}"\n`;
-  });
+  // ✅ Prepare data for Excel
+  const excelData = students.map(s => ({
+    "Student ID": s.id || "",
+    "Name": s.name || "",
+    "Guardian": s.guardian || "",
+    "Date of Birth": s.dob || "",
+    "Address": s.address || "",
+    "Belt": s.belt || "",
+    "Phone": s.phone || "",
+    "Gender": s.gender || ""
+  }));
 
-  // Create downloadable CSV file
-  let blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  let url = URL.createObjectURL(blob);
+  // ✅ Create worksheet
+  const ws = XLSX.utils.json_to_sheet(excelData);
 
-  let a = document.createElement("a");
-  a.href = url;
-  a.download = "Student_Master_Data.csv";
-  a.click();
+  // ✅ Auto column width
+  const colWidths = [
+    { wch: 15 },
+    { wch: 20 },
+    { wch: 20 },
+    { wch: 15 },
+    { wch: 30 },
+    { wch: 10 },
+    { wch: 15 },
+    { wch: 10 }
+  ];
+  ws["!cols"] = colWidths;
 
-  URL.revokeObjectURL(url);
+  // ✅ Create workbook
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Students");
 
-  alert("CSV exported successfully!");
+  // ✅ File name with date
+  const today = new Date().toISOString().split("T")[0];
+  const fileName = `Student_Master_${today}.xlsx`;
+
+  // ✅ Export
+  XLSX.writeFile(wb, fileName);
+
+  alert("✅ Excel file downloaded!");
 }
-
 /* =========================================================
    LOGIN / ROLE SYSTEM
 ========================================================= */

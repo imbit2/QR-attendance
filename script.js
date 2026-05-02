@@ -96,7 +96,7 @@ export async function autoDeleteAttendanceToday() {
 /* =========================================================
    EXPORT STUDENTS (FIREBASE VERSION)
 ========================================================= */
-export async function exportStudentsToExcel() {
+window.exportStudentsToExcel = async function () {
 
   const snap = await getDocs(collection(db, "students"));
   const students = [];
